@@ -1,0 +1,47 @@
+23 Dec 2012
+
+we only need to keep track of two basic things; patients and journals
+
+a patient has a name, a responsible party, and a journal
+
+a journal has all the information about a patient in dated entries
+
+* personal (unlikely to change, favored contact method, SSN etc, can
+  be created by patient)
+
+* healthist (questionaire, can be created by patient)
+
+* address
+
+* phone
+
+* email
+
+* appointment (date, time, length, procedures, charge (calculated from
+  fees?))
+
+* txplan (list of procedures)
+
+* insplan (company, contact information, free text "gotchas", anything
+  else useful?)
+
+* claim (insplan, appointment)
+
+* payment (from patient or insurance, amount, refs to procedures?)
+
+* progress (description of appointment, procedures, prognosis, etc)
+
+* contact (record of a phone call or email exchange or etc)
+
+* doc (scanned piece of paper)
+
+26 Dec 2012
+
+in order to efficiently generate the journal display, each entry has a
+summary recorded in the main "journal" table. then details can be
+generated (when requested or needed, e.g. for "detailed" views or
+printed reports) with another request to the appropriate table(s) for
+additional information.
+
+for simple entries of course all the information can be in the summary
+(e.g. phone numbers, e-mails, addresses).

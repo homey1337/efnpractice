@@ -1,0 +1,76 @@
+/* let's snug the body up against the frame */
+
+body {
+    padding: 0ex;
+    margin: 0ex;
+}
+
+/* a little padding */
+
+span, #journbar, #topbar {
+    padding: .5ex;
+}
+
+/* topbar: nice background, inline forms */
+
+#topbar {
+    background: #cceeff;
+}
+
+#topbar form {
+    display: inline;
+}
+
+/* patient: information displays as a table */
+
+#patient {
+}
+
+#patient div {
+    display: table-row;
+}
+
+#patient span {
+    display: table-cell;
+}
+
+/* journal bar: nice background */
+
+#journbar {
+    background: #ccccff;
+}
+
+/* journal: display as a table */
+
+#journal {
+}
+
+#journal div {
+    display: table-row;
+}
+
+#journal span {
+    display: table-cell;
+}
+
+/* these are rows in the journal; each type is color-coded */
+
+.appointment {
+    background: #def;
+}
+
+.insplan {
+    background: #fed;
+}
+
+.phone {
+    background: #ffd;
+}
+
+.address {
+    background: #fde;
+}
+
+.progress {
+    background: #edf;
+}
