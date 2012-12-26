@@ -45,3 +45,6 @@ additional information.
 
 for simple entries of course all the information can be in the summary
 (e.g. phone numbers, e-mails, addresses).
+
+adding a new patient is the same as editing a patient with nil as the
+id.

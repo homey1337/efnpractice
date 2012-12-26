@@ -1,4 +1,4 @@
-$def with (pt, resparty, journal)
+$def with (form, pt, resparty, journal)
 
 <html>
 <head>
@@ -8,11 +8,11 @@ $def with (pt, resparty, journal)
 <body>
 
 <div id="topbar">
-  <form>
-    <input type="text" name="query"/>
-    <input type="submit" value="Search"/>
+  <form method="POST">
+    $:form.render_css()
   </form>
   <a href="/newpt">new pt</a>
+  | <!-- or some other kind of separator -->
   <a href="/signout">signoff</a>
 </div>
 

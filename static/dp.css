@@ -16,6 +16,12 @@ a:hover {
     text-decoration: underline;
 }
 
+/* no labels in forms */
+
+form label {
+    display: none;
+}
+
 /* a little padding */
 
 span, #journbar, #topbar {
