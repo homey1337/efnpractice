@@ -1,0 +1,21 @@
+$def with (pts)
+
+<html>
+<head>
+<title>$pts[0].lastname Family - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+$for pt in pts:
+  <div class="familymember">
+    <span>
+      <a href="/pt/$pt.id">
+	$pt.firstname $pt.middlename $pt.lastname
+      </a>
+    </span>
+    <span>$pt.birthday</span>
+  </div>
+
+</body>
+</html>
