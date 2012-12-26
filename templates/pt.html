@@ -12,6 +12,7 @@ $def with (pt, resparty, journal)
     <input type="text" name="query"/>
     <input type="submit" value="Search"/>
   </form>
+  <a href="/newpt">new pt</a>
   <a href="/signout">signoff</a>
 </div>
 
@@ -21,12 +22,24 @@ $def with (pt, resparty, journal)
     <span>$pt.firstname $pt.middlename $pt.lastname</span>
   </div>
   <div>
+    <span>Birthday:</span>
+    <span>$pt.birthday</span>
+  </div>
+  <div>
     <span>Responsible Party:</span>
-    <span><a href="/pt/$resparty.id">$resparty.firstname $resparty.middlename $resparty.lastname</a><br/><a href="/family/$resparty.id">family</a></span>
+    <span>
+      <a href="/pt/$resparty.id">$resparty.firstname $resparty.middlename $resparty.lastname</a>
+      <br/>
+      <a href="/family/$resparty.id">family</a>
+    </span>
   </div>
   <div>
     <span>Personal:</span>
     <span>other personal info can go here</span>
+  </div>
+  <div>
+    <span>&nbsp;</span>
+    <span><a href="/edit/$pt.id">edit</a></span>
   </div>
 </div>
 
@@ -42,28 +55,41 @@ $code:
   now = time.time()
   future = True
 
-$for entry in journal:
-  $if future and entry.ts < now:
-    $code:
-      future = False
-    <div class="today">
-      <span>&nbsp;</span>
-      <span>new:</span>
-      <span>
-        <a href="new/appointment">appoint</a>
-        <a href="new/contact">contact</a>
-        <a href="new/doc">doc</a>
-        <a href="new/rx">Rx</a>
-        <a href="new/progress">progress</a>
-      </span>
-    </div>
-
+$while journal:
+  $code:
+    entry = journal.pop(0)
+    if entry.ts < now:
+      journal.insert(0, entry)
+      break
   <div class="$entry.kind">
     <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(entry.ts))</span>
     <span>$entry.kind</span>
     <span>$entry.summary</span>
     <span><a href="/$entry.kind/$entry.id">details</a></span>
   </div>
+
+<div class="today">
+  <span>&nbsp;</span>
+  <span>new:</span>
+  <span>
+    <a href="new/appointment">appoint</a>
+    <a href="new/contact">contact</a>
+    <a href="new/doc">doc</a>
+    <a href="new/rx">Rx</a>
+    <a href="new/progress">progress</a>
+  </span>
+</div>
+
+$while journal:
+  $code:
+    entry = journal.pop(0)
+  <div class="$entry.kind">
+    <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(entry.ts))</span>
+    <span>$entry.kind</span>
+    <span>$entry.summary</span>
+    <span><a href="/$entry.kind/$entry.id">details</a></span>
+  </div>
+
 </div>
 
 </body>

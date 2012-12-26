@@ -5,6 +5,7 @@ import web
 
 urls = (
     '/', 'index',
+    '/family/(.*)', 'family',
     '/pt/(.*)/', 'patient',
     '/pt/(.*)', 'patient_bounce',
 )
@@ -16,6 +17,17 @@ db = web.database(dbn='sqlite', db='dp.sqlite')
 class index:
     def GET(self):
         return 'Hello, world!'
+
+
+class family:
+    def GET(self, id_as_string):
+        try:
+            patientid = int(id_as_string)
+        except ValueError:
+            return 'patient id %r not found' % id_as_string
+
+        pts = list(db.where('patient', resparty=patientid))
+        return render.family(pts)
 
 
 class patient_bounce:

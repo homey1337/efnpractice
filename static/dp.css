@@ -5,6 +5,17 @@ body {
     margin: 0ex;
 }
 
+/* tweaks to links */
+
+a {
+    color: #33c;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
 /* a little padding */
 
 span, #journbar, #topbar {
