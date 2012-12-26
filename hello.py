@@ -21,6 +21,26 @@ class index:
         raise web.seeother('/pt/1/')
 
 
+# how to search for patients ... can come from multiple places
+
+search_form = web.form.Form(
+    web.form.Textbox('query'),
+    web.form.Button('submit', type='submit', html='Search')
+)
+
+def POST_search_for_patient():
+    f = search_form()
+    f.validates()
+    query = web.db.SQLQuery(['lastname like ', web.db.sqlquote(f.query.get_value() + '%')])
+    pts = list(db.select('patient', where=query))
+    if len(pts) == 1:
+        raise web.seeother('/pt/%d/' % pts[0].id)
+    elif len(pts) == 0:
+        return 'no patient found'
+    else:
+        return render.family(pts)
+
+
 # a list of multiple patients ... generally relatives
 
 class family:
@@ -35,11 +55,6 @@ class family:
 
 
 # patient display
-
-search_form = web.form.Form(
-    web.form.Textbox('query'),
-    web.form.Button('submit', type='submit', html='Search')
-)
 
 class patient_bounce:
     def GET(self, x):
@@ -62,16 +77,7 @@ class patient:
         return render.pt(search_form(), pt, resparty, journal)
 
     def POST(self, *args):
-        f = search_form()
-        f.validates()
-        #TODO: lazy, SQL injection vector
-        pts = list(db.select('patient', where='lastname like "%s%%"' % f.query.get_value()))
-        if len(pts) == 1:
-            raise web.seeother('/pt/%d/' % pts[0].id)
-        elif len(pts) == 0:
-            return 'no patient found'
-        else:
-            return render.family(pts)
+        return POST_search_for_patient()
 
 
 if __name__ == "__main__":
