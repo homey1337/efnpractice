@@ -68,6 +68,7 @@ span, #journbar, #topbar {
 /* journal: display as a table */
 
 #journal {
+    display: table;
 }
 
 #journal div {

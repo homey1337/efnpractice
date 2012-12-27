@@ -11,9 +11,9 @@ import forms
 urls = (
     '/', 'index',
     '/family/(.*)', 'family',
+    '/pt/(.*)/new/(.*)', 'new_journal',
     '/pt/(.*)/', 'patient',
     '/pt/(.*)', 'patient_bounce',
-    '/pt/(.*)/new/(.*)', 'new_journal',
     '/edit/(.*)/', 'edit_patient',
     '/edit/(.*)', 'edit_patient',
     '/newpt', 'edit_patient',
@@ -140,13 +140,61 @@ class edit_patient:
             raise web.seeother('/pt/%d/' % row.id)
 
 
+class new_handlers (web.storage):
+    @staticmethod
+    def address(journalid, form):
+        pass
+
+    @staticmethod
+    def phone(journalid, form):
+        pass
+
+    @staticmethod
+    def contact(journalid, form):
+        # insert detailed information into auxiliary table
+        pass
+
+    @staticmethod
+    def progress(journalid, form):
+        # insert detailed information into auxiliary table
+        pass
+
+    @staticmethod
+    def Rx(journalid, form):
+        # insert detailed information into auxiliary table
+        pass
+
+    @staticmethod
+    def doc(journalid, form):
+        # save uploaded document
+        pass
+
+    @staticmethod
+    def appointment(journalid, form):
+        # will probably need a more specialized handler
+        pass
+
+
 class new_journal:
     def GET(self, patientid, kind):
         pt = list(db.where('patient', id=patientid))[0]
-        return render.journal(pt, forms.journal[kind])
+        return render.journal(pt, kind, forms.journal[kind]())
 
     def POST(self, patientid, kind):
-        raise web.seeother('/pt/%d/' % pt.id)
+        pt = list(db.where('patient', id=patientid))[0]
+        f = forms.journal[kind]()
+        if f.validates():
+            # make the row in journal
+            journalid = db.insert('journal',
+                                  patientid=pt.id,
+                                  ts=web.db.sqlliteral("strftime('%s','now')"),
+                                  kind=kind,
+                                  summary=f.summary.get_value())
+            # pass it off for further processing
+            getattr(new_handlers, kind)(journalid, f)
+            raise web.seeother('/pt/%d/' % pt.id)
+        else:
+            return render.journal(pt, kind, f)
 
         
 if __name__ == "__main__":

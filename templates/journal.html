@@ -1,0 +1,25 @@
+$def with (pt, kind, form)
+
+<html>
+<head>
+<title>New $kind.capitalize() for $pt.firstname $pt.middlename $pt.lastname - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+<h1>New $kind.capitalize() for $pt.firstname $pt.middlename $pt.lastname</h1>
+
+<form method="POST">
+  $for input in form.inputs:
+    $if not input.is_hidden():
+      <div>
+	<span>$input.description</span>
+	<span>$:input.render()</span>
+	<span>$input.note</span>
+      </div>
+    $else:
+      $:input.render()
+</form>
+
+</body>
+</html>
