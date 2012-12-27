@@ -13,7 +13,7 @@ urls = (
     '/family/(.*)', 'family',
     '/pt/(.*)/', 'patient',
     '/pt/(.*)', 'patient_bounce',
-    '/pt/(.*)/new/address', 'new_address',
+    '/pt/(.*)/new/(.*)', 'new_journal',
     '/edit/(.*)/', 'edit_patient',
     '/edit/(.*)', 'edit_patient',
     '/newpt', 'edit_patient',
@@ -52,23 +52,18 @@ class index:
         # other useful things; recent journal entries
         return render.index(forms.search())
 
-    def POST(self, *args):
+    def POST(self):
         return POST_search_for_patient()
 
 
 # a list of multiple patients ... generally relatives
 
 class family:
-    def GET(self, id_as_string):
-        try:
-            patientid = int(id_as_string)
-        except ValueError:
-            return 'patient id %r not found' % id_as_string
-
+    def GET(self, patientid):
         pts = list(db.where('patient', resparty=patientid))
         return render.family(forms.search(), pts)
 
-    def POST(self, *args):
+    def POST(self, patientid):
         return POST_search_for_patient()
 
 
@@ -79,12 +74,7 @@ class patient_bounce:
         raise web.seeother('/pt/%s/' % x)
 
 class patient:
-    def GET(self, id_as_string):
-        try:
-            patientid = int(id_as_string)
-        except ValueError:
-            return 'patient id %r not found' % id_as_string
-
+    def GET(self, patientid):
         pt = list(db.where('patient', id=patientid))[0]
         if pt.resparty:
             resparty = list(db.where('patient', id=pt.resparty))[0]
@@ -94,19 +84,17 @@ class patient:
 
         return render.pt(forms.search(), pt, resparty, journal)
 
-    def POST(self, *args):
+    def POST(self, patientid):
         return POST_search_for_patient()
 
 
 # patient edit
 
 class edit_patient:
-    def GET(self, id_as_string=''):
-        try:
-            patientid = int(id_as_string)
+    def GET(self, patientid=''):
+        if patientid:
             pt = list(db.where('patient', id=patientid))[0]
-        except ValueError:
-            patientid = None
+        else:
             pt = None
 
         f = forms.patient()
@@ -126,7 +114,7 @@ class edit_patient:
 
         return render.edit_patient(f)
 
-    def POST(self, *args):
+    def POST(self, patientid=''):
         f = forms.patient()
         if not f.validates():
             return render.edit_patient(f)
@@ -152,13 +140,14 @@ class edit_patient:
             raise web.seeother('/pt/%d/' % row.id)
 
 
-class new_address:
-    def GET(self, id_as_string, kind):
-        try:
-            patientid = int(id_as_string)
-        except ValueError:
-            return 'patient id %r not found' % id_as_string
+class new_journal:
+    def GET(self, patientid, kind):
         pt = list(db.where('patient', id=patientid))[0]
+        return render.journal(pt, forms.journal[kind])
+
+    def POST(self, patientid, kind):
+        raise web.seeother('/pt/%d/' % pt.id)
+
         
 if __name__ == "__main__":
     app.run()
