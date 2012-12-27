@@ -50,8 +50,12 @@ $def with (form, pt, resparty, journal)
   <a href="new/progress">progress</a>
 </div>
 
+$ future = True
 <div id="journal">
 $for entry in journal:
+  $if future and entry.ts < time.time():
+    $ future = False
+    <hr/>
   <div class="$entry.kind">
     <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(entry.ts))</span>
     <span>$entry.kind</span>
