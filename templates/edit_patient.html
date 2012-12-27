@@ -1,0 +1,20 @@
+$def with (form)
+
+<html>
+<head>
+<title>Edit Patient - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+<form method="POST">
+  $for input in form.inputs:
+    $if not isinstance(input, web.form.Hidden):
+      <div>
+	<span>$input.description</span>
+	<span>$:input.render()</span>
+      </div>
+</form>
+
+</body>
+</html>

@@ -1,21 +1,25 @@
-$def with (pts)
+$def with (form, pts)
 
 <html>
 <head>
-<title>$pts[0].lastname Family - dp</title>
+<title>Patients - dp</title>
 <link rel="stylesheet" href="/static/dp.css"/>
 </head>
 <body>
 
+<form class="nolabels" method="POST">
+$:form.render_css()
+</form>
+
+<div id="ptlist">
 $for pt in pts:
   <div class="familymember">
     <span>
-      <a href="/pt/$pt.id">
-	$pt.firstname $pt.middlename $pt.lastname
-      </a>
+      <a href="/pt/$pt.id">$pt.firstname $pt.middlename $pt.lastname</a>
     </span>
     <span>$pt.birthday</span>
   </div>
+</div>
 
 </body>
 </html>

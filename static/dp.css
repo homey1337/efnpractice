@@ -22,6 +22,14 @@ form.nolabels label {
     display: none;
 }
 
+form div {
+    display: table-row;
+}
+
+form span {
+    display: table-cell;
+}
+
 /* a little padding */
 
 span, #journbar, #topbar {
@@ -90,4 +98,17 @@ span, #journbar, #topbar {
 
 .progress {
     background: #edf;
+}
+
+/* patient list table magic */
+
+#ptlist {
+}
+
+#ptlist div {
+    display: table-row;
+}
+
+#ptlist span {
+    display: table-cell;
 }

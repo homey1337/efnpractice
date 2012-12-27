@@ -48,48 +48,22 @@ $def with (form, pt, resparty, journal)
   <a href="/pt/$pt.id?filter=contact">contacts</a>
   <a href="/pt/$pt.id?filter=clinical">clinical</a>
   <a href="/pt/$pt.id?filter=money">money</a>
+  new:
+  <a href="new/appointment">appoint</a>
+  <a href="new/contact">contact</a>
+  <a href="new/doc">doc</a>
+  <a href="new/rx">Rx</a>
+  <a href="new/progress">progress</a>
 </div>
 
 <div id="journal">
-$code:
-  now = time.time()
-  future = True
-
-$while journal:
-  $code:
-    entry = journal.pop(0)
-    if entry.ts < now:
-      journal.insert(0, entry)
-      break
+$for entry in journal:
   <div class="$entry.kind">
     <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(entry.ts))</span>
     <span>$entry.kind</span>
     <span>$entry.summary</span>
     <span><a href="/$entry.kind/$entry.id">details</a></span>
   </div>
-
-<div class="today">
-  <span>&nbsp;</span>
-  <span>new:</span>
-  <span>
-    <a href="new/appointment">appoint</a>
-    <a href="new/contact">contact</a>
-    <a href="new/doc">doc</a>
-    <a href="new/rx">Rx</a>
-    <a href="new/progress">progress</a>
-  </span>
-</div>
-
-$while journal:
-  $code:
-    entry = journal.pop(0)
-  <div class="$entry.kind">
-    <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(entry.ts))</span>
-    <span>$entry.kind</span>
-    <span>$entry.summary</span>
-    <span><a href="/$entry.kind/$entry.id">details</a></span>
-  </div>
-
 </div>
 
 </body>
