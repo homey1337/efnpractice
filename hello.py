@@ -1,6 +1,11 @@
+# standard library imports
 import time
 
+# web.py
 import web
+
+# my imports
+import forms
 
 
 urls = (
@@ -8,6 +13,8 @@ urls = (
     '/family/(.*)', 'family',
     '/pt/(.*)/', 'patient',
     '/pt/(.*)', 'patient_bounce',
+    '/pt/(.*)/new/address', 'new_address',
+    '/edit/(.*)/', 'edit_patient',
     '/edit/(.*)', 'edit_patient',
     '/newpt', 'edit_patient',
 )
@@ -17,11 +24,6 @@ db = web.database(dbn='sqlite', db='dp.sqlite')
 
 
 # how to search for patients ... can come from multiple places
-
-search_form = web.form.Form(
-    web.form.Textbox('query'),
-    web.form.Button('submit', type='submit', html='Search')
-)
 
 def pt_search(q):
     q = q.replace(',','%,').replace(', ',',').replace(' ','% ')
@@ -33,7 +35,7 @@ def pt_search(q):
     return list(db.select('patient', where=query))
 
 def POST_search_for_patient():
-    f = search_form()
+    f = forms.search()
     f.validates()
     q = ' '.join(f.query.get_value().split())
     pts = pt_search(q)
@@ -48,7 +50,7 @@ def POST_search_for_patient():
 class index:
     def GET(self):
         # other useful things; recent journal entries
-        return render.index(search_form())
+        return render.index(forms.search())
 
     def POST(self, *args):
         return POST_search_for_patient()
@@ -64,7 +66,7 @@ class family:
             return 'patient id %r not found' % id_as_string
 
         pts = list(db.where('patient', resparty=patientid))
-        return render.family(search_form(), pts)
+        return render.family(forms.search(), pts)
 
     def POST(self, *args):
         return POST_search_for_patient()
@@ -90,35 +92,13 @@ class patient:
             resparty = pt
         journal = list(db.where('journal', order='ts DESC', limit=10, patientid=pt.id))
 
-        return render.pt(search_form(), pt, resparty, journal)
+        return render.pt(forms.search(), pt, resparty, journal)
 
     def POST(self, *args):
         return POST_search_for_patient()
 
 
 # patient edit
-
-not_empty = web.form.regexp(r'.', 'cannot be empty')
-looks_like_date = web.form.regexp(r'[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}',
-                                  "doesn't look like a date (YYYY-MM-DD)")
-def _rp_is_unique_pt(i):
-    if i:
-        pts = pt_search(i)
-        return len(pts) == 1
-    else:
-        return True
-names_unique_pt = web.form.Validator("doesn't name a unique patient", _rp_is_unique_pt)
-
-patient_form = web.form.Form(
-    web.form.Hidden('id'),
-    web.form.Hidden('resparty'),
-    web.form.Textbox('firstname', not_empty, description='First name'),
-    web.form.Textbox('middlename', description='Middle name'),
-    web.form.Textbox('lastname', not_empty, description='Last name'),
-    web.form.Textbox('birthday', looks_like_date, description='Birthday'),
-    web.form.Textbox('resparty_text', names_unique_pt, description='Responsible Party'),
-    web.form.Button('submit', type='submit', html='Save'),
-)
 
 class edit_patient:
     def GET(self, id_as_string=''):
@@ -129,7 +109,7 @@ class edit_patient:
             patientid = None
             pt = None
 
-        f = patient_form()
+        f = forms.patient()
         if pt:
             f.id.set_value(pt.id)
             f.resparty.set_value(pt.resparty)
@@ -147,7 +127,7 @@ class edit_patient:
         return render.edit_patient(f)
 
     def POST(self, *args):
-        f = patient_form()
+        f = forms.patient()
         if not f.validates():
             return render.edit_patient(f)
         else:
@@ -172,5 +152,13 @@ class edit_patient:
             raise web.seeother('/pt/%d/' % row.id)
 
 
+class new_address:
+    def GET(self, id_as_string, kind):
+        try:
+            patientid = int(id_as_string)
+        except ValueError:
+            return 'patient id %r not found' % id_as_string
+        pt = list(db.where('patient', id=patientid))[0]
+        
 if __name__ == "__main__":
     app.run()
