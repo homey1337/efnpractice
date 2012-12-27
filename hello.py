@@ -24,9 +24,12 @@ search_form = web.form.Form(
 )
 
 def pt_search(q):
-    q = q.replace(',','%,').replace(', ',',').replace(' ','% ') + '%'
+    q = q.replace(',','%,').replace(', ',',').replace(' ','% ')
+    if not q:
+        return list()
+    else:
+        q += '%'
     query = web.db.SQLQuery(["coalesce(lastname,'')||','||coalesce(firstname,'')||' '||coalesce(middlename,'') like ", web.db.sqlquote(q)])
-    print 'pt_search(%r)' % q
     return list(db.select('patient', where=query))
 
 def POST_search_for_patient():
@@ -99,8 +102,11 @@ not_empty = web.form.regexp(r'.', 'cannot be empty')
 looks_like_date = web.form.regexp(r'[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}',
                                   "doesn't look like a date (YYYY-MM-DD)")
 def _rp_is_unique_pt(i):
-    pts = pt_search(i)
-    return len(pts) == 1
+    if i:
+        pts = pt_search(i)
+        return len(pts) == 1
+    else:
+        return True
 names_unique_pt = web.form.Validator("doesn't name a unique patient", _rp_is_unique_pt)
 
 patient_form = web.form.Form(
@@ -148,8 +154,12 @@ class edit_patient:
             #TODO: transaction!
 
             #TODO: this query is done twice now (here and during validation)
-            rp = pt_search(f.resparty_text.get_value())
-            resparty = rp[0].id
+            if f.resparty_text.get_value():
+                rp = pt_search(f.resparty_text.get_value())
+                resparty = rp[0].id
+            else:
+                rp = None
+                resparty = None
 
             db.query('insert or replace into patient(id,firstname,middlename,lastname,birthday,resparty) values ($id,$firstname,$middlename,$lastname,$birthday,$resparty)',
                      dict(id=f.id.get_value() or None,

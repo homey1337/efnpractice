@@ -9,10 +9,11 @@ $def with (form)
 
 <form method="POST">
   $for input in form.inputs:
-    $if not isinstance(input, web.form.Hidden):
+    $if not input.is_hidden():
       <div>
 	<span>$input.description</span>
 	<span>$:input.render()</span>
+	<span>$input.note</span>
       </div>
 </form>
 
