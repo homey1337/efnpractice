@@ -38,6 +38,7 @@ def POST_search_for_patient():
 
 class index:
     def GET(self):
+        # other useful things; recent journal entries
         return render.index(search_form())
 
     def POST(self, *args):
