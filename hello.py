@@ -14,13 +14,6 @@ render = web.template.render('templates/', globals=globals()) #lazy!
 db = web.database(dbn='sqlite', db='dp.sqlite')
 
 
-class index:
-    def GET(self):
-        # TODO: something useful
-        # list of patients? recent journal entries?
-        raise web.seeother('/pt/1/')
-
-
 # how to search for patients ... can come from multiple places
 
 search_form = web.form.Form(
@@ -39,6 +32,16 @@ def POST_search_for_patient():
         return 'no patient found'
     else:
         return render.family(pts)
+
+
+# ye olde index
+
+class index:
+    def GET(self):
+        return render.index(search_form())
+
+    def POST(self, *args):
+        return POST_search_for_patient()
 
 
 # a list of multiple patients ... generally relatives
