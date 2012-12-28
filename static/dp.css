@@ -82,6 +82,40 @@ span, #journbar, #topbar {
 
 /* these are rows in the journal; each type is color-coded */
 
+#journal .frobbitz {
+    background: dde;
+    background: ddf;
+    background: dee;
+    background: dfe;
+    background: dff;
+    background: edd;
+    background: ede;
+    background: eed;
+    background: efe;
+    background: eff;
+    background: fdd;
+    background: fdf;
+    background: fee;
+    background: fef;
+    background: ffe;
+}
+
+#journal .email {
+    background: dfd;
+}
+
+#journal .contact {
+    background: efd;
+}
+
+#journal .doc {
+    background: ded;
+}
+
+#journal .Rx {
+    background: eef;
+}
+
 #journal .appointment {
     background: #def;
 }
