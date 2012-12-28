@@ -149,6 +149,10 @@ class new_handlers (web.storage):
         pass
 
     @staticmethod
+    def email(journalid, form):
+        pass
+
+    @staticmethod
     def phone(journalid, form):
         pass
 

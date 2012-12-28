@@ -41,6 +41,10 @@ journal = dict(
         Textbox('summary', not_empty, description='Phone'),
         Button('submit', type='submit', html='New')
         ),
+    email = Form(
+        Textbox('summary', not_empty, description='Email'),
+        Button('submit', type='submit', html='New')
+        ),
     contact = Form(
         Textbox('summary', not_empty, description='Summary'),
         Textarea('details', not_empty, description='Details'),
