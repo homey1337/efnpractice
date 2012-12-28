@@ -1,0 +1,41 @@
+h1 {
+    display: none;
+}
+
+#Rxdoctor {
+    display: table;
+    width: 100%;
+    margin-bottom: 1em;
+    float: none;
+    border: 1px solid black;
+}
+
+#Rxpatient {
+    display: table;
+    width: 100%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    float: none;
+    border: 1px solid black;
+}
+
+#Rx {
+    width: 100%;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    float: none;
+    border: 1px solid black;
+}
+
+#Rxsignature {
+    display: table;
+    width: 100%;
+    height: 4em;
+    margin-top: 1em;
+    float: none;
+    border: 1px solid black;
+}
+
+.label {
+    width: 8em;
+}

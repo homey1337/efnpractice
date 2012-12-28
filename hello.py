@@ -245,15 +245,22 @@ class view_handlers (web.storage):
 
     @staticmethod
     def contact(journal):
-        pass
+        contact = list(db.where('contact', journalid=journal.id))[0]
+        pt = list(db.where('patient', id=journal.patientid))[0]
+        return render.contact(journal, contact, pt)
 
     @staticmethod
     def progress(journal):
-        pass
+        progress = list(db.where('progress', journalid=journal.id))[0]
+        pt = list(db.where('patient', id=journal.patientid))[0]
+        return render.progress(journal, progress, pt)
 
     @staticmethod
     def Rx(journal):
-        pass
+        Rx = list(db.where('Rx', journalid=journal.id))[0]
+        pt = list(db.where('patient', id=journal.patientid))[0]
+        address = list(db.where('journal', kind='address', patientid=pt.id, order='ts desc'))[0]
+        return render.Rx(journal, Rx, pt, address)
 
     @staticmethod
     def doc(journal):

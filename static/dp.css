@@ -49,6 +49,7 @@ span, #journbar, #topbar {
 /* patient: information displays as a table */
 
 #patient {
+    display: table;
 }
 
 #patient div {
@@ -81,23 +82,23 @@ span, #journbar, #topbar {
 
 /* these are rows in the journal; each type is color-coded */
 
-.appointment {
+#journal .appointment {
     background: #def;
 }
 
-.insplan {
+#journal .insplan {
     background: #fed;
 }
 
-.phone {
+#journal .phone {
     background: #ffd;
 }
 
-.address {
+#journal .address {
     background: #fde;
 }
 
-.progress {
+#journal .progress {
     background: #edf;
 }
 
@@ -112,4 +113,77 @@ span, #journbar, #topbar {
 
 #ptlist span {
     display: table-cell;
+}
+
+/* contact details styling */
+
+#contact {
+    display: table;
+}
+
+#contact div {
+    display: table-row;
+}
+
+#contact span {
+    display: table-cell;
+}
+
+/* progress details styling */
+
+#progress {
+    display: table;
+}
+
+#progress div {
+    display: table-row;
+}
+
+#progress span {
+    display: table-cell;
+}
+
+/* Rx details styling */
+
+#Rx {
+    display: table;
+}
+
+#Rx div {
+    display: table-row;
+}
+
+#Rx span {
+    display: table-cell;
+}
+
+/* Other rx boxes only display when printed
+   (handled by rx-print.css stylesheet) */
+
+#Rxdoctor {
+    display: none;
+}
+
+#Rxdoctor div {
+    display: table-row;
+}
+
+#Rxdoctor span {
+    display: table-cell;
+}
+
+#Rxpatient {
+    display: none;
+}
+
+#Rxpatient div {
+    display: table-row;
+}
+
+#Rxpatient span {
+    display: table-cell;
+}
+
+#Rxsignature {
+    display: none;
 }

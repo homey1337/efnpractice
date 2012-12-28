@@ -1,0 +1,28 @@
+$def with (journal, contact, pt)
+
+<html>
+<head>
+<title>Contact with $pt.firstname $pt.middlename $pt.lastname - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+<h1>Contact with $pt.firstname $pt.middlename $pt.lastname</h1>
+
+<div id="contact">
+  <div class="when">
+    <span>When</span>
+    <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(journal.ts))</span>
+  </div>
+  <div class="summary">
+    <span>Summary</span>
+    <span>$journal.summary</span>
+  </div>
+  <div class="detail">
+    <span>Details</span>
+    <span>$contact.details</span>
+  </div>
+</div>
+
+</body>
+</html>

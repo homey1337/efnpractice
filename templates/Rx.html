@@ -1,0 +1,83 @@
+$def with (journal, Rx, pt, address)
+
+<html>
+<head>
+<title>Rx for $pt.firstname $pt.middlename $pt.lastname - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+<link rel="stylesheet" href="/static/rx-print.css" media="print"/>
+</head>
+<body>
+
+<h1>Rx for $pt.firstname $pt.middlename $pt.lastname</h1>
+
+<div id="Rxdoctor">
+  <div class="name">
+    <span class="label">Doctor</span>
+    <span>Daniel Smith McNair</span>
+  </div>
+  <div class="practice">
+    <span class="label">Practice</span>
+    <span>McNair Family Dentistry</span>
+  </div>
+  <div class="address">
+    <span class="label">Address</span>
+    <span>125 E 3rd St<br/>Ste A<br/>Edmond OK 73034</span>
+  </div>
+  <div class="phone">
+    <span class="label">Phone</span>
+    <span>405-703-5344</span>
+  </div>
+  <div class="NPI">
+    <span class="label">NPI</span>
+    <span>1508029331</span>
+  </div>
+  <div class="DEA">
+    <span class="label">DEA</span>
+    <span>FM0951310</span>
+  </div>
+</div>
+
+<div id="Rxpatient">
+  <div class="name">
+    <span class="label">Patient</span>
+    <span>$pt.firstname $pt.middlename $pt.lastname</span>
+  </div>
+  <div class="birthdate">
+    <span class="label">Birthdate</span>
+    <span>$pt.birthday</span>
+  </div>
+  <div class="address">
+    <span class="label">Address</span>
+    <span>$address.summary</span>
+  </div>
+</div>
+
+<div id="Rx">
+  <div class="when">
+    <span class="label">Date</span>
+    <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(journal.ts))</span>
+  </div>
+  <div class="drug">
+    <span class="label">Drug</span>
+    <span>$journal.summary</span>
+  </div>
+  <div class="disp">
+    <span class="label">Disp</span>
+    <span>$Rx.disp</span>
+  </div>
+  <div class="sig">
+    <span class="label">Sig</span>
+    <span>$Rx.sig</span>
+  </div>
+  <div class="refills">
+    <span class="label">Refills</span>
+    <span>$Rx.refills</span>
+  </div>
+</div>
+
+<div id="Rxsignature">
+  <span>Signature</span>
+</div>
+
+</body>
+</html>
