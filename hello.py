@@ -245,24 +245,15 @@ class view_handlers (web.storage):
 
     @staticmethod
     def contact(journal):
-        db.insert('contact', journalid=journalid, details=form.details.get_value())
+        pass
 
     @staticmethod
     def progress(journal):
-        db.insert('progress',
-                  journalid=journalid,
-                  sub=form.sub.get_value(),
-                  obj=form.obj.get_value(),
-                  ass=form.ass.get_value(),
-                  pln=form.pln.get_value())
+        pass
 
     @staticmethod
     def Rx(journal):
-        db.insert('rx',
-                  journalid=journalid,
-                  disp=form.disp.get_value(),
-                  sig=form.sig.get_value(),
-                  refills=form.refills.get_value())
+        pass
 
     @staticmethod
     def doc(journal):
