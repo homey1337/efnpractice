@@ -9,7 +9,7 @@ $def with (pt, kind, form)
 
 <h1>New $kind.capitalize() for $pt.firstname $pt.middlename $pt.lastname</h1>
 
-<form method="POST">
+<form method="POST" enctype="multipart/form-data">
   $for input in form.inputs:
     $if not input.is_hidden():
       <div>

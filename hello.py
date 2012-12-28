@@ -1,11 +1,16 @@
 # standard library imports
+import mimetypes
 import time
 
-# web.py
+# nonstandard libraries
+import magic
 import web
 
 # my imports
 import forms
+
+
+#TODO: transactions?
 
 
 urls = (
@@ -119,8 +124,6 @@ class edit_patient:
         if not f.validates():
             return render.edit_patient(f)
         else:
-            #TODO: transaction!
-
             #TODO: this query is done twice now (here and during validation)
             if f.resparty_text.get_value():
                 rp = pt_search(f.resparty_text.get_value())
@@ -151,23 +154,34 @@ class new_handlers (web.storage):
 
     @staticmethod
     def contact(journalid, form):
-        # insert detailed information into auxiliary table
-        pass
+        db.insert('contact', journalid=journalid, details=form.details.get_value())
 
     @staticmethod
     def progress(journalid, form):
-        # insert detailed information into auxiliary table
-        pass
+        db.insert('progress',
+                  journalid=journalid,
+                  sub=form.sub.get_value(),
+                  obj=form.obj.get_value(),
+                  ass=form.ass.get_value(),
+                  pln=form.pln.get_value())
 
     @staticmethod
     def Rx(journalid, form):
-        # insert detailed information into auxiliary table
-        pass
+        db.insert('rx',
+                  journalid=journalid,
+                  disp=form.disp.get_value(),
+                  sig=form.sig.get_value(),
+                  refills=form.refills.get_value())
 
     @staticmethod
     def doc(journalid, form):
-        # save uploaded document
-        pass
+        filedir = 'upload'
+        data = form.file.get_value()
+        mime = magic.from_buffer(data, mime=True)
+        ext = mimetypes.guess_extension(mime) #includes the leading dot
+        fout = open('%s/%s%s' % (filedir, journalid, ext), 'wb')
+        fout.write(data)
+        fout.close()
 
     @staticmethod
     def appointment(journalid, form):

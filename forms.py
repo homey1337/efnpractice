@@ -58,9 +58,9 @@ journal = dict(
     # should allow free entry too
     Rx = Form(
         Textbox('summary', not_empty, description='Drug'),
-        Textarea('disp', not_empty, description='Disp'),
-        Textarea('sig', not_empty, description='Sig'),
-        Textarea('refills', not_empty, description='Refills', value='0 (zero)'),
+        Textbox('disp', not_empty, description='Disp'),
+        Textbox('sig', not_empty, description='Sig'),
+        Textbox('refills', not_empty, description='Refills', value='0 (zero)'),
         Button('submit', type='submit', html='New')
         ),
     # need to upload files
