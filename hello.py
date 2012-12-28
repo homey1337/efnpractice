@@ -25,10 +25,7 @@ urls = (
     '/edit/(.*)/', 'edit_patient',
     '/edit/(.*)', 'edit_patient',
     '/newpt', 'edit_patient',
-    '/address/(.*)', 'show_address',
-    '/phone/(.*)', 'show_phone',
-    '/email/(.*)', 'show_email',
-    '/doc/(.*)', 'show_doc',
+    '/journal/(.*)', 'show_journal',
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!
@@ -222,18 +219,22 @@ class new_journal:
             return render.journal(pt, kind, f)
 
 
-class show_address:
-    def GET(self, id):
-        entry = list(db.where('journal', id=id))[0]
-        address = entry.summary
+class view_handlers (web.storage):
+    @staticmethod
+    def address(journal):
+        address = journal.summary
         raise web.seeother('http://maps.google.com/search?'
                            + urllib.urlencode(dict(q=address)))
 
-
-class show_phone:
-    def GET(self, id):
+    @staticmethod
+    def email(journal):
         entry = list(db.where('journal', id=id))[0]
-        phone = entry.summary
+        email = entry.summary
+        raise web.seeother('mailto:%s' % email)
+
+    @staticmethod
+    def phone(journal):
+        phone = journal.summary
         q = phone.split(':')
         if len(q) == 1:
             raise web.seeother('tel:%s' % q[0].replace(' ',''))
@@ -242,19 +243,31 @@ class show_phone:
         else:
             return 'unintelligible phone entry %r' % phone
 
+    @staticmethod
+    def contact(journal):
+        db.insert('contact', journalid=journalid, details=form.details.get_value())
 
-class show_email:
-    def GET(self, id):
-        entry = list(db.where('journal', id=id))[0]
-        email = entry.summary
-        raise web.seeother('mailto:%s' % email)
+    @staticmethod
+    def progress(journal):
+        db.insert('progress',
+                  journalid=journalid,
+                  sub=form.sub.get_value(),
+                  obj=form.obj.get_value(),
+                  ass=form.ass.get_value(),
+                  pln=form.pln.get_value())
 
+    @staticmethod
+    def Rx(journal):
+        db.insert('rx',
+                  journalid=journalid,
+                  disp=form.disp.get_value(),
+                  sig=form.sig.get_value(),
+                  refills=form.refills.get_value())
 
-class show_doc:
-    def GET(self, id):
-        entry = list(db.where('journal', id=id))[0]
+    @staticmethod
+    def doc(journal):
         files = os.listdir('upload')
-        r = re.compile(r'%s\.' % entry.id)
+        r = re.compile(r'%s\.' % journal.id)
         files = filter(r.match, files)
         if len(files) != 1:
             raise ValueError("multiple filename matches for %r" % entry.id)
@@ -263,6 +276,17 @@ class show_doc:
             mimetype = mimetypes.guess_type(filename)[0]
             web.header('Content-Type', mimetype)
             return file('upload/%s' % filename, 'rb')
+
+    @staticmethod
+    def appointment(journal):
+        # will probably need a more specialized handler
+        pass
+
+
+class show_journal:
+    def GET(self, id):
+        journal = list(db.where('journal', id=id))[0]
+        return getattr(view_handlers, journal.kind)(journal)
 
 
 if __name__ == "__main__":

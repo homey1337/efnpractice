@@ -59,7 +59,7 @@ $for entry in journal:
     <hr/>
   <div class="$entry.kind">
     <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(entry.ts))</span>
-    <span><a href="/$entry.kind/$entry.id">$entry.kind</a></span>
+    <span><a href="/journal/$entry.id">$entry.kind</a></span>
     <span>$entry.summary</span>
   </div>
 </div>
