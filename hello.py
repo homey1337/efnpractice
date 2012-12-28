@@ -1,6 +1,9 @@
 # standard library imports
 import mimetypes
+import os
+import re
 import time
+import urllib
 
 # nonstandard libraries
 import magic
@@ -22,6 +25,10 @@ urls = (
     '/edit/(.*)/', 'edit_patient',
     '/edit/(.*)', 'edit_patient',
     '/newpt', 'edit_patient',
+    '/address/(.*)', 'show_address',
+    '/phone/(.*)', 'show_phone',
+    '/email/(.*)', 'show_email',
+    '/doc/(.*)', 'show_doc',
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!
@@ -214,6 +221,49 @@ class new_journal:
         else:
             return render.journal(pt, kind, f)
 
-        
+
+class show_address:
+    def GET(self, id):
+        entry = list(db.where('journal', id=id))[0]
+        address = entry.summary
+        raise web.seeother('http://maps.google.com/search?'
+                           + urllib.urlencode(dict(q=address)))
+
+
+class show_phone:
+    def GET(self, id):
+        entry = list(db.where('journal', id=id))[0]
+        phone = entry.summary
+        q = phone.split(':')
+        if len(q) == 1:
+            raise web.seeother('tel:%s' % q[0].replace(' ',''))
+        elif len(q) == 2:
+            raise web.seeother('tel:%s' % q[1].replace(' ',''))
+        else:
+            return 'unintelligible phone entry %r' % phone
+
+
+class show_email:
+    def GET(self, id):
+        entry = list(db.where('journal', id=id))[0]
+        email = entry.summary
+        raise web.seeother('mailto:%s' % email)
+
+
+class show_doc:
+    def GET(self, id):
+        entry = list(db.where('journal', id=id))[0]
+        files = os.listdir('upload')
+        r = re.compile(r'%s\.' % entry.id)
+        files = filter(r.match, files)
+        if len(files) != 1:
+            raise ValueError("multiple filename matches for %r" % entry.id)
+        else:
+            filename = files[0]
+            mimetype = mimetypes.guess_type(filename)[0]
+            web.header('Content-Type', mimetype)
+            return file('upload/%s' % filename, 'rb')
+
+
 if __name__ == "__main__":
     app.run()
