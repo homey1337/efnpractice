@@ -16,19 +16,19 @@ $def with (journal, progress, pt)
   </div>
   <div class="sub">
     <span>Subjective</span>
-    <span>$progress.sub</span>
+    <span>$:progress.sub.replace('\n','<br/>')</span>
   </div>
   <div class="obj">
     <span>Objective</span>
-    <span>$progress.obj</span>
+    <span>$:progress.obj.replace('\n','<br/>')</span>
   </div>
   <div class="ass">
     <span>Assessment</span>
-    <span>$progress.ass</span>
+    <span>$:progress.ass.replace('\n','<br/>')</span>
   </div>
   <div class="pln">
     <span>Plan</span>
-    <span>$progress.pln</span>
+    <span>$:progress.pln.replace('\n','<br/>')</span>
   </div>
 </div>
 
