@@ -80,6 +80,10 @@ span, #journbar, #topbar {
     display: table-cell;
 }
 
+#journal span.money {
+    text-align: right;
+}
+
 /* these are rows in the journal; each type is color-coded */
 
 #journal .frobbitz {

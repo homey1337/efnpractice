@@ -52,6 +52,7 @@ $def with (form, pt, resparty, journal)
 </div>
 
 $ future = True
+$ balance = 0.0
 <div id="journal">
 $for entry in journal:
   $if future and entry.ts < time.time():
@@ -61,6 +62,13 @@ $for entry in journal:
     <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(entry.ts))</span>
     <span><a href="/journal/$entry.id">$entry.kind</a></span>
     <span>$entry.summary</span>
+    $if entry.money:
+      <span class="money">$('$ %.2f' % entry.money)</span>
+      $ balance += entry.money
+      <span class="money">$('$ %.2f' % balance)</span>
+    $else:
+      <span> </span>
+      <span> </span>
   </div>
 </div>
 
