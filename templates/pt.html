@@ -2,7 +2,7 @@ $def with (form, pt, resparty, journal)
 
 <html>
 <head>
-<title>$pt.firstname $pt.middlename $pt.lastname - dp</title>
+<title>$model.pt_name(pt) - dp</title>
 <link rel="stylesheet" href="/static/dp.css"/>
 </head>
 <body>
@@ -19,7 +19,7 @@ $def with (form, pt, resparty, journal)
 <div id="patient">
   <div>
     <span>Name:</span>
-    <span>$pt.firstname $pt.middlename $pt.lastname</span>
+    <span>$model.pt_name(pt)</span>
   </div>
   <div>
     <span>Birthday:</span>
@@ -28,7 +28,7 @@ $def with (form, pt, resparty, journal)
   <div>
     <span>Responsible Party:</span>
     <span>
-      <a href="/pt/$resparty.id">$resparty.firstname $resparty.middlename $resparty.lastname</a>
+      <a href="/pt/$resparty.id">$model.pt_name(resparty)</a>
       <br/>
       <a href="/family/$resparty.id">family</a>
     </span>

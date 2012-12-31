@@ -2,12 +2,12 @@ $def with (pt, kind, form)
 
 <html>
 <head>
-<title>New $kind.capitalize() for $pt.firstname $pt.middlename $pt.lastname - dp</title>
+<title>New $kind.capitalize() for $model.pt_name(pt) - dp</title>
 <link rel="stylesheet" href="/static/dp.css"/>
 </head>
 <body>
 
-<h1>New $kind.capitalize() for $pt.firstname $pt.middlename $pt.lastname</h1>
+<h1>New $kind.capitalize() for $model.pt_name(pt)</h1>
 
 <form method="POST" enctype="multipart/form-data">
   $for input in form.inputs:

@@ -2,13 +2,13 @@ $def with (journal, Rx, pt, address)
 
 <html>
 <head>
-<title>Rx for $pt.firstname $pt.middlename $pt.lastname - dp</title>
+<title>Rx for $model.pt_name(pt) - dp</title>
 <link rel="stylesheet" href="/static/dp.css"/>
 <link rel="stylesheet" href="/static/rx-print.css" media="print"/>
 </head>
 <body>
 
-<h1>Rx for $pt.firstname $pt.middlename $pt.lastname</h1>
+<h1>Rx for $model.pt_name(pt)</h1>
 
 <div id="Rxdoctor">
   <div class="name">
@@ -40,7 +40,7 @@ $def with (journal, Rx, pt, address)
 <div id="Rxpatient">
   <div class="name">
     <span class="label">Patient</span>
-    <span>$pt.firstname $pt.middlename $pt.lastname</span>
+    <span>$model.pt_name(pt)</span>
   </div>
   <div class="birthdate">
     <span class="label">Birthdate</span>

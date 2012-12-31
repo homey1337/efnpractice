@@ -15,7 +15,7 @@ $:form.render_css()
 $for pt in pts:
   <div class="familymember">
     <span>
-      <a href="/pt/$pt.id">$pt.firstname $pt.middlename $pt.lastname</a>
+      <a href="/pt/$pt.id">$model.pt_name(pt)</a>
     </span>
     <span>$pt.birthday</span>
   </div>

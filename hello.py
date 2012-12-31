@@ -98,18 +98,14 @@ class edit_patient:
 
         f = forms.patient()
         if pt:
-            f.id.set_value(pt.id)
-            f.resparty.set_value(pt.resparty)
-            f.firstname.set_value(pt.firstname)
-            f.middlename.set_value(pt.middlename)
-            f.lastname.set_value(pt.lastname)
-            f.birthday.set_value(pt.birthday)
+            for key in pt:
+                f[key].set_value(pt[key])
 
             if pt.resparty:
                 rp = model.get_pt(pt.resparty)
-                f.resparty_text.set_value('%s, %s %s' % (rp.lastname or '', rp.firstname or '', rp.middlename or ''))
+                f.resparty_text.set_value(model.pt_name(rp))
             else:
-                f.resparty_text.set_value('%s, %s %s' % (pt.lastname or '', pt.firstname or '', pt.middlename or ''))
+                f.resparty_text.set_value(model.pt_name(pt))
 
         return render.edit_patient(f)
 
