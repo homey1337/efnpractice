@@ -103,9 +103,9 @@ class edit_patient:
 
             if pt.resparty:
                 rp = model.get_pt(pt.resparty)
-                f.resparty_text.set_value(model.pt_name(rp))
+                f.resparty_text.set_value(model.pt_name(rp, first='lastname'))
             else:
-                f.resparty_text.set_value(model.pt_name(pt))
+                f.resparty_text.set_value(model.pt_name(pt, first='lastname'))
 
         return render.edit_patient(f)
 

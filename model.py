@@ -51,8 +51,11 @@ def create_schema():
 # pt
 
 
-def pt_name(pt):
-    return '%s, %s %s' % (pt.lastname or '', pt.firstname or '', pt.middlename or '')
+def pt_name(pt, first='firstname'):
+    if first == 'lastname':
+        return '%s, %s %s' % (pt.lastname or '', pt.firstname or '', pt.middlename or '')
+    else:
+        return '%s %s %s' % (pt.firstname or '', pt.middlename or '', pt.lastname or '')
 
 def pt_name_search(q):
     q = q.replace(',','%,').replace(', ',',').replace(' ','% ')
