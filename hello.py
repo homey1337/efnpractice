@@ -89,6 +89,7 @@ class patient:
             resparty = list(db.where('patient', id=pt.resparty))[0]
         else:
             resparty = pt
+        #TODO: a way to get the rest after 10
         journal = list(db.where('journal', order='ts DESC', limit=10, patientid=pt.id))
 
         return render.pt(forms.search(), pt, resparty, journal)
