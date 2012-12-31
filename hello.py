@@ -11,6 +11,7 @@ import web
 
 # my imports
 import forms
+import model
 
 
 #TODO: transactions?
@@ -29,25 +30,15 @@ urls = (
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!
-db = web.database(dbn='sqlite', db='dp.sqlite')
 
 
 # how to search for patients ... can come from multiple places
-
-def pt_search(q):
-    q = q.replace(',','%,').replace(', ',',').replace(' ','% ')
-    if not q:
-        return list()
-    else:
-        q += '%'
-    query = web.db.SQLQuery(["coalesce(lastname,'')||','||coalesce(firstname,'')||' '||coalesce(middlename,'') like ", web.db.sqlquote(q)])
-    return list(db.select('patient', where=query))
 
 def POST_search_for_patient():
     f = forms.search()
     f.validates()
     q = ' '.join(f.query.get_value().split())
-    pts = pt_search(q)
+    pts = model.pt_name_search(q)
     if len(pts) == 1:
         raise web.seeother('/pt/%d/' % pts[0].id)
     else:
@@ -69,8 +60,7 @@ class index:
 
 class family:
     def GET(self, patientid):
-        pts = list(db.where('patient', resparty=patientid))
-        return render.family(forms.search(), pts)
+        return render.family(forms.search(), model.get_family(patientid))
 
     def POST(self, patientid):
         return POST_search_for_patient()
@@ -84,13 +74,12 @@ class patient_bounce:
 
 class patient:
     def GET(self, patientid):
-        pt = list(db.where('patient', id=patientid))[0]
+        pt = model.get_pt(patientid)
         if pt.resparty:
-            resparty = list(db.where('patient', id=pt.resparty))[0]
+            resparty = model.get_pt(pt.resparty)
         else:
             resparty = pt
-        #TODO: a way to get the rest after 10
-        journal = list(db.where('journal', order='ts DESC', limit=10, patientid=pt.id))
+        journal = model.get_journal(pt.id)
 
         return render.pt(forms.search(), pt, resparty, journal)
 
@@ -103,7 +92,7 @@ class patient:
 class edit_patient:
     def GET(self, patientid=''):
         if patientid:
-            pt = list(db.where('patient', id=patientid))[0]
+            pt = model.get_pt(patientid)
         else:
             pt = None
 
@@ -117,7 +106,7 @@ class edit_patient:
             f.birthday.set_value(pt.birthday)
 
             if pt.resparty:
-                rp = list(db.where('patient', id=pt.resparty))[0]
+                rp = model.get_pt(pt.resparty)
                 f.resparty_text.set_value('%s, %s %s' % (rp.lastname or '', rp.firstname or '', rp.middlename or ''))
             else:
                 f.resparty_text.set_value('%s, %s %s' % (pt.lastname or '', pt.firstname or '', pt.middlename or ''))
@@ -131,90 +120,28 @@ class edit_patient:
         else:
             #TODO: this query is done twice now (here and during validation)
             if f.resparty_text.get_value():
-                rp = pt_search(f.resparty_text.get_value())
+                # validation already established that this mapping is unique
+                # so we do not need to check it here
+                rp = model.pt_name_search(f.resparty_text.get_value())
                 resparty = rp[0].id
             else:
                 rp = None
                 resparty = None
 
-            db.query('insert or replace into patient(id,firstname,middlename,lastname,birthday,resparty) values ($id,$firstname,$middlename,$lastname,$birthday,$resparty)',
-                     dict(id=f.id.get_value() or None,
-                          firstname=f.firstname.get_value(),
-                          middlename=f.middlename.get_value(),
-                          lastname=f.lastname.get_value(),
-                          birthday=f.birthday.get_value(),
-                          resparty=resparty))
-            row = list(db.query('select last_insert_rowid() as id'))[0]
-            raise web.seeother('/pt/%d/' % row.id)
-
-
-class new_handlers (web.storage):
-    @staticmethod
-    def address(journalid, form):
-        pass
-
-    @staticmethod
-    def email(journalid, form):
-        pass
-
-    @staticmethod
-    def phone(journalid, form):
-        pass
-
-    @staticmethod
-    def contact(journalid, form):
-        db.insert('contact', journalid=journalid, details=form.details.get_value())
-
-    @staticmethod
-    def progress(journalid, form):
-        db.insert('progress',
-                  journalid=journalid,
-                  sub=form.sub.get_value(),
-                  obj=form.obj.get_value(),
-                  ass=form.ass.get_value(),
-                  pln=form.pln.get_value())
-
-    @staticmethod
-    def Rx(journalid, form):
-        db.insert('rx',
-                  journalid=journalid,
-                  disp=form.disp.get_value(),
-                  sig=form.sig.get_value(),
-                  refills=form.refills.get_value())
-
-    @staticmethod
-    def doc(journalid, form):
-        filedir = 'upload'
-        data = form.file.get_value()
-        mime = magic.from_buffer(data, mime=True)
-        ext = mimetypes.guess_extension(mime) #includes the leading dot
-        fout = open('%s/%s%s' % (filedir, journalid, ext), 'wb')
-        fout.write(data)
-        fout.close()
-
-    @staticmethod
-    def appointment(journalid, form):
-        # will probably need a more specialized handler
-        pass
+            newid = model.update_pt(f, resparty)
+            raise web.seeother('/pt/%d/' % newid)
 
 
 class new_journal:
     def GET(self, patientid, kind):
-        pt = list(db.where('patient', id=patientid))[0]
+        pt = model.get_pt(patientid)
         return render.journal(pt, kind, forms.journal[kind]())
 
     def POST(self, patientid, kind):
-        pt = list(db.where('patient', id=patientid))[0]
+        pt = model.get_pt(patientid)
         f = forms.journal[kind]()
         if f.validates():
-            # make the row in journal
-            journalid = db.insert('journal',
-                                  patientid=pt.id,
-                                  ts=web.db.sqlliteral("strftime('%s','now')"),
-                                  kind=kind,
-                                  summary=f.summary.get_value())
-            # pass it off for further processing
-            getattr(new_handlers, kind)(journalid, f)
+            model.new_journal(pt, kind, f)
             raise web.seeother('/pt/%d/' % pt.id)
         else:
             return render.journal(pt, kind, f)
@@ -229,8 +156,7 @@ class view_handlers (web.storage):
 
     @staticmethod
     def email(journal):
-        entry = list(db.where('journal', id=id))[0]
-        email = entry.summary
+        email = journal.summary
         raise web.seeother('mailto:%s' % email)
 
     @staticmethod
@@ -246,21 +172,21 @@ class view_handlers (web.storage):
 
     @staticmethod
     def contact(journal):
-        contact = list(db.where('contact', journalid=journal.id))[0]
-        pt = list(db.where('patient', id=journal.patientid))[0]
+        contact = model.get_contact(journal.id)
+        pt = model.get_pt(journal.patientid)
         return render.contact(journal, contact, pt)
 
     @staticmethod
     def progress(journal):
-        progress = list(db.where('progress', journalid=journal.id))[0]
-        pt = list(db.where('patient', id=journal.patientid))[0]
+        progress = model.get_progress(journal.id)
+        pt = model.get_pt(journal.patientid)
         return render.progress(journal, progress, pt)
 
     @staticmethod
     def Rx(journal):
-        Rx = list(db.where('Rx', journalid=journal.id))[0]
-        pt = list(db.where('patient', id=journal.patientid))[0]
-        address = list(db.where('journal', kind='address', patientid=pt.id, order='ts desc'))[0]
+        Rx = model.get_Rx(journal.id)
+        pt = model.get_pt(journal.patientid)
+        address = model.get_latest_address(pt.id)
         return render.Rx(journal, Rx, pt, address)
 
     @staticmethod
@@ -284,7 +210,7 @@ class view_handlers (web.storage):
 
 class show_journal:
     def GET(self, id):
-        journal = list(db.where('journal', id=id))[0]
+        journal = model.get_journal_entry(id)
         return getattr(view_handlers, journal.kind)(journal)
 
 

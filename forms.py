@@ -1,3 +1,5 @@
+import model
+
 from web.form import *
 
 search = Form(
@@ -10,10 +12,8 @@ looks_like_date = regexp(r'[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}',
                                   "doesn't look like a date (YYYY-MM-DD)")
 
 def _rp_is_unique_pt(i):
-    # ugly ...
-    import hello
     if i:
-        pts = hello.pt_search(i)
+        pts = model.pt_name_search(i)
         return len(pts) == 1
     else:
         return True
