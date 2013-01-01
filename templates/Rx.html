@@ -55,7 +55,7 @@ $def with (journal, Rx, pt, address)
 <div id="Rx">
   <div class="when">
     <span class="label">Date</span>
-    <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(journal.ts))</span>
+    <span>$model.display_dt_string(model.from_dt_string(journal.ts))</span>
   </div>
   <div class="drug">
     <span class="label">Drug</span>

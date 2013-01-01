@@ -12,7 +12,7 @@ $def with (journal, progress, pt)
 <div id="progress">
   <div class="when">
     <span>When</span>
-    <span>$time.strftime('%Y-%m-%d %H:%M', time.localtime(journal.ts))</span>
+    <span>$model.display_dt_string(model.from_dt_string(journal.ts))</span>
   </div>
   <div class="sub">
     <span>Subjective</span>

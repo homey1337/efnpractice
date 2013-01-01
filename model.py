@@ -1,9 +1,15 @@
 import datetime
 
+import pytz
 import web
 
 
 db = web.database(dbn='sqlite', db='dp.sqlite')
+
+# TODO: belongs in config file
+tz = pytz.timezone('US/Central')
+db_fmt = '%Y-%m-%d %H:%M:%S.%f'
+display_fmt = '%Y-%m-%d %H:%M (%Z)'
 
 
 # =================================================================
@@ -46,6 +52,19 @@ def create_schema():
         db.query(q)
 
 
+def current_time():
+    return datetime.datetime.now(pytz.utc)
+
+def to_dt_string(dt):
+    return dt.strftime(db_fmt)
+
+def from_dt_string(s):
+    return datetime.datetime.strptime(s, db_fmt).replace(tzinfo=pytz.utc)
+
+def display_dt_string(dt):
+    return dt.astimezone(tz).strftime(display_fmt)
+
+
 # schema
 # =================================================================
 # pt
@@ -73,6 +92,9 @@ def get_pt(id):
         return None
 
 def get_family(resparty):
+    # TODO should include the resparty if their resparty entry is blank
+    #  ... it would be nice to avoid this by always putting a resparty in
+    #  ... but that's nontrivial for new patients :/
     return db.where('patient', resparty=resparty)
 
 def update_pt(f, resparty):
@@ -85,6 +107,7 @@ def update_pt(f, resparty):
     return row.id
 
 def get_latest_address(patientid):
+    # TODO: should go to responsible party if pt doesn't have an address
     addresses = db.where('journal', kind='address', patientid=patientid, order='id DESC')
     try:
         return addresses[0]
@@ -150,7 +173,7 @@ class new_handlers (web.storage):
 def new_journal(pt, kind, f):
     journalid = db.insert('journal',
                           patientid = pt.id,
-                          ts = datetime.datetime.utcnow(),
+                          ts = to_dt_string(current_time()),
                           kind = kind,
                           summary = f.summary.get_value())
     getattr(new_handlers, kind)(journalid, f)
@@ -169,7 +192,7 @@ def get_progress(journalid):
     return db.where('progress', journalid=journalid)[0]
 
 def get_Rx(journalid):
-    return db.where('Rx', journalid=journalid)
+    return db.where('Rx', journalid=journalid)[0]
 
 
 # journal
