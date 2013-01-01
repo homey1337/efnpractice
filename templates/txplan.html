@@ -1,0 +1,25 @@
+$def with (pt, newtx, txplan)
+
+<html>
+<head>
+<title>Tx for $model.pt_name(pt) - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+<h1>Tx for $model.pt_name(pt)</h1>
+
+<div id="txplan">
+$for tx in txplan:
+  <div class="tx">
+    <span>$tx.summary</span>
+    <span class="money">$('$ %.2f' % tx.fee)</span>
+  </div>
+</div>
+
+<form class="nolabels" method="POST">
+  $:newtx.render_css()
+</form>
+
+</body>
+</html>

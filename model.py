@@ -17,34 +17,43 @@ display_fmt = '%Y-%m-%d %H:%M (%Z)'
 
 
 schema = [
-    'create table contact if not exists'
+    'create table if not exists contact'
     ' (journalid integer primary key,'
     '  details text)',
-    'create table journal if not exists'
+    'create table if not exists journal'
     ' (id integer primary key,'
     '  patientid integer references patient(id),'
     '  ts datetime,'
     '  kind string,'
     '  summary text,'
-    '  money real)',
-    'create table patient if not exists'
+    '  money currency)',
+    'create table if not exists patient'
     ' (id integer primary key,'
     '  firstname string,'
     '  middlename string,'
     '  lastname string,'
     '  resparty integer references patient(id),'
     '  birthday date)',
-    'create table progress if not exists'
+    'create table if not exists progress'
     ' (journalid integer primary key,'
     '  sub text,'
     '  obj text,'
     '  ass text,'
     '  pln text)',
-    'create table rx if not exists'
+    'create table if not exists rx'
     ' (journalid integer primary key,'
     '  disp string,'
     '  sig string,'
     '  refills string)',
+    'create table if not exists txplan'
+    ' (id integer primary key,'
+    '  journalid integer references journal(id),'
+    '  patientid integer references patient(id),'
+    '  summary string,'
+    '  code integer,'
+    '  tooth string,'
+    '  surf string,'
+    '  fee currency)',
 ]
 
 def create_schema():
@@ -196,4 +205,16 @@ def get_Rx(journalid):
 
 
 # journal
+# =================================================================
+# txplan
+
+
+def get_txplan(patientid):
+    return db.where('txplan', patientid=patientid)
+
+def new_tx(patientid, **kw):
+    return db.insert('txplan', patientid=patientid, **kw)
+
+
+# txplan
 # =================================================================

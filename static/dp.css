@@ -225,3 +225,17 @@ span, #journbar, #topbar {
 #Rxsignature {
     display: none;
 }
+
+/* tx plan styling */
+
+#txplan {
+    display: table;
+}
+
+#txplan div {
+    display: table-row;
+}
+
+#txplan span {
+    display: table-cell;
+}

@@ -27,6 +27,7 @@ urls = (
     '/edit/(.*)', 'edit_patient',
     '/newpt', 'edit_patient',
     '/journal/(.*)', 'show_journal',
+    '/txplan/(.*)', 'txplan.show',
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!

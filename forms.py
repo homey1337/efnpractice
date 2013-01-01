@@ -77,3 +77,8 @@ journal = dict(
     # probably needs special handling all the way down
     appointment = Form(),
 )
+
+newtx = Form(
+    Textbox('tx', not_empty, description='Treatment'),
+    Button('submit', type='submit', html='Tx'),
+)
