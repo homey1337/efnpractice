@@ -80,7 +80,7 @@ span, #journbar, #topbar {
     display: table-cell;
 }
 
-#journal span.money {
+span.money {
     text-align: right;
 }
 

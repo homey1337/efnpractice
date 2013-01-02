@@ -13,6 +13,9 @@ $def with (pt, newtx, txplan)
 $for tx in txplan:
   <div class="tx">
     <span>$tx.summary</span>
+    <span>$('D%04d' % tx.code)</span>
+    <span>$tx.tooth</span>
+    <span>$tx.surf</span>
     <span class="money">$('$ %.2f' % tx.fee)</span>
   </div>
 </div>

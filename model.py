@@ -49,6 +49,7 @@ schema = [
     ' (id integer primary key,'
     '  journalid integer references journal(id),'
     '  patientid integer references patient(id),'
+    '  appointmentid integer references appointment(id),'
     '  summary string,'
     '  code integer,'
     '  tooth string,'
