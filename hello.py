@@ -187,6 +187,13 @@ class view_handlers (web.storage):
         return render.Rx(journal, Rx, pt, address)
 
     @staticmethod
+    def appointment(journal):
+        appt = model.get_appointment(journal.id)
+        pt = model.get_pt(journal.patientid)
+        txs = model.get_tx_for_appointment(appt.journalid)
+        return render.appointment(journal, appt, pt, txs)
+
+    @staticmethod
     def doc(journal):
         files = os.listdir('upload')
         r = re.compile(r'%s\.' % journal.id)
@@ -198,11 +205,6 @@ class view_handlers (web.storage):
             mimetype = mimetypes.guess_type(filename)[0]
             web.header('Content-Type', mimetype)
             return file('upload/%s' % filename, 'rb')
-
-    @staticmethod
-    def appointment(journal):
-        # will probably need a more specialized handler
-        pass
 
 
 class show_journal:

@@ -81,8 +81,12 @@ def current_time():
 def to_dt_string(dt):
     return dt.strftime(db_fmt)
 
-def from_dt_string(s):
-    return datetime.datetime.strptime(s, db_fmt).replace(tzinfo=pytz.utc)
+def from_dt_string(s, fmt=None, tz=None):
+    if not fmt:
+        fmt = db_fmt
+    if not tz:
+        tz = pytz.utc
+    return datetime.datetime.strptime(s, fmt).replace(tzinfo=tz)
 
 def display_dt_string(dt):
     return dt.astimezone(tz).strftime(display_fmt)
@@ -189,9 +193,11 @@ class new_handlers (web.storage):
 
     @staticmethod
     def appointment(journalid, form):
-        # will probably need a more specialized handler
-        pass
-
+        dt = from_dt_string(form.dt.get_value(), "%Y-%m-%d %H:%M", tz)
+        duration = int(form.duration.get_value())
+        kind = form.kind.get_value()
+        db.insert('appointment', journalid=journalid, duration=duration, kind=kind)
+        db.update('journal', where=('id=%d' % journalid), ts=to_dt_string(dt))
 
 def new_journal(pt, kind, f):
     journalid = db.insert('journal',
@@ -217,6 +223,9 @@ def get_progress(journalid):
 def get_Rx(journalid):
     return db.where('Rx', journalid=journalid)[0]
 
+def get_appointment(journalid):
+    return db.where('appointment', journalid=journalid)[0]
+
 
 # journal
 # =================================================================
@@ -239,6 +248,37 @@ def tx_status(tx):
 def new_tx(patientid, **kw):
     return db.insert('tx', patientid=patientid, **kw)
 
+def get_tx_for_appointment(appointmentid):
+    return db.where('tx', appointmentid=appointmentid)
+
 
 # txplan
+# =================================================================
+# appointment
+
+
+def appts_on_day(dt):
+    start_day = dt.replace(hour=0, minute=0, second=0).astimezone(pytz.utc)
+    end_day = (dt + datetime.timedelta(seconds=86400)).replace(hour=0, minute=0, second=0).astimezone(pytz.utc)
+
+    Q = web.db.SQLQuery
+    P = web.db.SQLParam
+
+    print 'from', start_day
+    print 'to', end_day
+
+    return db.select(['journal','appointment'],
+                     where=Q(['journal.kind=',P('appointment'),
+                              'and ts>',P(to_dt_string(start_day)),
+                              'and ts<',P(to_dt_string(end_day)),
+                              'and journal.id=appointment.journalid']),
+                     order='ts ASC').list()
+
+def new_appt(patientid, dt, **kw):
+    at = dt.replace(second=0, microsecond=0, minute=(dt.minute - dt.minute%10)).astimezone(pytz.utc)
+    journalid = db.insert('journal', patientid=patientid, ts=to_dt_string(at), kind='appointment', summary='test')
+    return db.insert('appointment', journalid=journalid, **kw)
+
+
+# appointment
 # =================================================================

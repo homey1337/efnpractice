@@ -1,0 +1,52 @@
+$def with (journal, appt, pt, txs)
+
+<html>
+<head>
+<title>Appointment for $model.pt_name(pt) - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+<div id="appt">
+  <div>
+    <span>When</span>
+    <span>$model.display_dt_string(model.from_dt_string(journal.ts))</span>
+  </div>
+  <div>
+    <span>Length</span>
+    <span>$appt.duration</span>
+  </div>
+  <div>
+    <span>Summary</span>
+    <span>$journal.summary</span>
+  </div>
+  <div>
+    <span>Kind</span>
+    <span>$appt.kind</span>
+  </div>
+  <div>
+    <span>Status</span>
+    <span>$appt.status</span>
+  </div>
+  <div>
+    <span>Treatments</span>
+    <span>
+      $ total = 0.0
+      <div id="txplan">
+      $for tx in txs:
+        <div class="tx">
+	  <span>$tx.summary</span>
+	  $ total += tx.fee
+	  <span class="money">$('$ %.2f' % tx.fee)</span>
+	</div>
+      <div class="total">
+	<span>total</span>
+	<span class="money">$('$ %.2f' % total)</span>
+      </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+</body>
+</html>

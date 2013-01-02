@@ -239,3 +239,22 @@ span.money {
 #txplan span {
     display: table-cell;
 }
+
+/* appointment styling */
+
+#appt {
+    display: table;
+}
+
+#appt div {
+    display: table-row;
+}
+
+#appt span {
+    display: table-cell;
+}
+
+.total {
+    border-top: 1px solid black;
+    font-weight: bold;
+}

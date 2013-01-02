@@ -1,3 +1,5 @@
+import datetime
+
 import model
 
 from web.form import *
@@ -7,9 +9,25 @@ search = Form(
     Button('submit', type='submit', html='Search')
 )
 
+class dateformat (Validator):
+    def __init__(self, fmt, msg=None):
+        if msg is None:
+            msg = "doesn't match date format (%s)" % fmt
+        self.fmt = fmt
+        self.msg = msg
+
+    def valid(self, val):
+        try:
+            dt = datetime.datetime.strptime(val, self.fmt)
+            return True
+        except ValueError:
+            return False
+
 not_empty = regexp(r'.', 'cannot be empty')
-looks_like_date = regexp(r'[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}',
-                                  "doesn't look like a date (YYYY-MM-DD)")
+looks_like_date = dateformat('%Y-%m-%d', "doesn't look like a date (YYYY-MM-DD)")
+looks_like_dt = dateformat('%Y-%m-%d %H:%M',
+                           "doesn't look like a date and time (YYYY-MM-DD HH:MM)")
+looks_like_number = regexp(r'[0-9]+',"doesn't look like a number")
 
 def _rp_is_unique_pt(i):
     if i:
@@ -73,9 +91,13 @@ journal = dict(
         File('file', description='File'),
         Button('submit', type='submit', html='New')
         ),
-    # and this is the elephant in the room
-    # probably needs special handling all the way down
-    appointment = Form(),
+    appointment = Form(
+        Textbox('summary', not_empty, description='Summary'),
+        Textbox('dt', looks_like_dt, description='When'),
+        Textbox('duration', looks_like_number, description='Length'),
+        Textbox('kind', not_empty, description='Kind'),
+        Button('submit', type='submit', html='New')
+        ),
 )
 
 newtx = Form(
