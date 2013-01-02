@@ -17,16 +17,7 @@ display_fmt = '%Y-%m-%d %H:%M (%Z)'
 
 
 schema = [
-    'create table if not exists contact'
-    ' (journalid integer primary key,'
-    '  details text)',
-    'create table if not exists journal'
-    ' (id integer primary key,'
-    '  patientid integer references patient(id),'
-    '  ts datetime,'
-    '  kind string,'
-    '  summary text,'
-    '  money currency)',
+    # makes extensive use of automatic string concatenation by the parser
     'create table if not exists patient'
     ' (id integer primary key,'
     '  firstname string,'
@@ -34,17 +25,38 @@ schema = [
     '  lastname string,'
     '  resparty integer references patient(id),'
     '  birthday date)',
+
+    'create table if not exists journal'
+    ' (id integer primary key,'
+    '  patientid integer references patient(id),'
+    '  ts datetime,'
+    '  kind string,'
+    '  summary text,'
+    '  money currency)',
+
+    'create table if not exists contact'
+    ' (journalid integer primary key,'
+    '  details text)',
+
+    'create table if not exists appointment'
+    ' (journalid integer primary key,'
+    '  duration integer,'
+    '  status string,'
+    '  kind string)',
+
     'create table if not exists progress'
     ' (journalid integer primary key,'
     '  sub text,'
     '  obj text,'
     '  ass text,'
     '  pln text)',
+
     'create table if not exists rx'
     ' (journalid integer primary key,'
     '  disp string,'
     '  sig string,'
     '  refills string)',
+
     'create table if not exists tx'
     ' (id integer primary key,'
     '  journalid integer references journal(id),'
