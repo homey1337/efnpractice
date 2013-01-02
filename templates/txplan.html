@@ -17,6 +17,7 @@ $for tx in txplan:
     <span>$tx.tooth</span>
     <span>$tx.surf</span>
     <span class="money">$('$ %.2f' % tx.fee)</span>
+    <span>$model.tx_status(tx)</span>
   </div>
 </div>
 

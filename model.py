@@ -45,11 +45,12 @@ schema = [
     '  disp string,'
     '  sig string,'
     '  refills string)',
-    'create table if not exists txplan'
+    'create table if not exists tx'
     ' (id integer primary key,'
     '  journalid integer references journal(id),'
     '  patientid integer references patient(id),'
     '  appointmentid integer references appointment(id),'
+    '  claimid integer references claim(id),'
     '  summary string,'
     '  code integer,'
     '  tooth string,'
@@ -211,10 +212,20 @@ def get_Rx(journalid):
 
 
 def get_txplan(patientid):
-    return db.where('txplan', patientid=patientid)
+    return db.where('tx', patientid=patientid)
+
+def tx_status(tx):
+    status = list()
+    if tx.journalid:
+        status.append('posted')
+    if tx.appointmentid:
+        status.append('scheduled')
+    if tx.claimid:
+        status.append('filed')
+    return ', '.join(status)
 
 def new_tx(patientid, **kw):
-    return db.insert('txplan', patientid=patientid, **kw)
+    return db.insert('tx', patientid=patientid, **kw)
 
 
 # txplan
