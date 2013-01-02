@@ -281,12 +281,10 @@ def new_appt(patientid, dt, **kw):
     journalid = db.insert('journal', patientid=patientid, ts=to_dt_string(at), kind='appointment', summary='test')
     return db.insert('appointment', journalid=journalid, **kw)
 
-def appt_tx_clear(appointmentid):
+def appt_tx_set(appointmentid, txs):
     db.update('tx',
               where='appointmentid = %d' % appointmentid,
               appointmentid=None)
-
-def appt_tx_set(appointmentid, txs):
     db.update('tx',
               where='id in %s' % str(tuple(txs)),
               appointmentid=appointmentid)

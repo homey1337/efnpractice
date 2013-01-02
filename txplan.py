@@ -124,7 +124,6 @@ class edit_appt:
     def POST(self, id):
         inp = web.input(txs=list())
         id = int(id)
-        model.appt_tx_clear(id)
         txs = list()
         for tx in inp.txs:
             txs.append(int(tx))
