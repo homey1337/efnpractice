@@ -11,6 +11,10 @@ $# TODO: all this needs to be editable (!)
 
 <div id="appt">
   <div>
+    <span>Who</span>
+    <span><a href="/pt/$pt.id">$model.pt_name(pt)</a></span>
+  </div>
+  <div>
     <span>When</span>
     <span>$model.display_dt_string(model.from_dt_string(journal.ts))</span>
   </div>
@@ -35,6 +39,9 @@ $# TODO: all this needs to be editable (!)
     <span>
       $ total = 0.0
       <div id="txplan">
+      <div>
+	<span><a href="/appointment/$journal.id/tx">change</a></span>
+      </div>
       $for tx in txs:
         <div class="tx">
 	  <span>$tx.summary</span>

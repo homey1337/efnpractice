@@ -193,6 +193,8 @@ class new_handlers (web.storage):
 
     @staticmethod
     def appointment(journalid, form):
+        # TODO should appointments in the past be legal? how to fail?
+        #  ... transactions!
         dt = from_dt_string(form.dt.get_value(), "%Y-%m-%d %H:%M", tz).astimezone(pytz.utc)
         duration = int(form.duration.get_value())
         kind = form.kind.get_value()
@@ -279,6 +281,15 @@ def new_appt(patientid, dt, **kw):
     journalid = db.insert('journal', patientid=patientid, ts=to_dt_string(at), kind='appointment', summary='test')
     return db.insert('appointment', journalid=journalid, **kw)
 
+def appt_tx_clear(appointmentid):
+    db.update('tx',
+              where='appointmentid = %d' % appointmentid,
+              appointmentid=None)
+
+def appt_tx_set(appointmentid, txs):
+    db.update('tx',
+              where='id in %s' % str(tuple(txs)),
+              appointmentid=appointmentid)
 
 # appointment
 # =================================================================

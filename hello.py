@@ -29,6 +29,8 @@ urls = (
     '/edit/(.*)', 'edit_patient',
     '/newpt', 'edit_patient',
     '/journal/(.*)', 'show_journal',
+    '/appointment/(.*)/tx', 'txplan.edit_appt',
+    '/appointment/(.*)', 'show_journal',
     '/txplan/(.*)', 'txplan.show',
 )
 app = web.application(urls, globals())

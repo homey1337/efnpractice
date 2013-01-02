@@ -2,6 +2,7 @@ from hello import render
 import forms
 import model
 
+import web
 
 def new_tx(patientid, summary):
     tokens = [x.lower() for x in summary.split()]
@@ -110,3 +111,22 @@ class show:
                 newtx.inputs[0].note = e.message
         txplan = model.get_txplan(pt.id)
         return render.txplan(pt, newtx, txplan)
+
+
+class edit_appt:
+    def GET(self, id):
+        journal = model.get_journal_entry(id)
+        appointment = model.get_appointment(journal.id)
+        pt = model.get_pt(journal.patientid)
+        txs = model.get_txplan(pt.id)
+        return render.edit_appt(journal, appointment, pt, txs)
+
+    def POST(self, id):
+        inp = web.input(txs=list())
+        id = int(id)
+        model.appt_tx_clear(id)
+        txs = list()
+        for tx in inp.txs:
+            txs.append(int(tx))
+        model.appt_tx_set(id, txs)
+        raise web.seeother('/appointment/%s' % id)
