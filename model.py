@@ -193,7 +193,7 @@ class new_handlers (web.storage):
 
     @staticmethod
     def appointment(journalid, form):
-        dt = from_dt_string(form.dt.get_value(), "%Y-%m-%d %H:%M", tz)
+        dt = from_dt_string(form.dt.get_value(), "%Y-%m-%d %H:%M", tz).astimezone(pytz.utc)
         duration = int(form.duration.get_value())
         kind = form.kind.get_value()
         db.insert('appointment', journalid=journalid, duration=duration, kind=kind)
