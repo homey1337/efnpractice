@@ -139,9 +139,6 @@ def get_pt(id):
         return None
 
 def get_family(resparty):
-    # TODO should include the resparty if their resparty entry is blank
-    #  ... it would be nice to avoid this by always putting a resparty in
-    #  ... but that's nontrivial for new patients :/
     return db.where('patient', resparty=resparty)
 
 def update_pt(f, resparty):
@@ -151,6 +148,8 @@ def update_pt(f, resparty):
     d['resparty'] = resparty
     db.query('insert or replace into patient values ($id, $firstname, $middlename, $lastname, $resparty, $birthday)', d)
     row = db.query('select last_insert_rowid() as id')[0]
+    if d['id'] is None:
+        db.update('patient', where='id=%d' % row.id, resparty=row.id)
     return row.id
 
 def get_latest_address(patientid):
