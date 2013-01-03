@@ -245,6 +245,7 @@ class new_appointment:
             f.duration.set_value('%s'%appt.duration)
             f.kind.set_value(appt.kind)
             f.notes.set_value(appt.note)
+            f.submit.attrs['html'] = 'Save'
         return render.newappt(f)
 
     def POST(self, id=None):

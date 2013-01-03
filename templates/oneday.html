@@ -1,5 +1,5 @@
 $def with (today,appts,pts)
-$# appts here is a join of appointment & journal
+$# appts here is already a join of appointment & journal
 
 <html>
 <head>
@@ -39,6 +39,18 @@ body {
   overflow: hidden;
 }
 
+.test {
+  background-color: #fb9;
+}
+
+.tx {
+  background-color: #b9f;
+}
+
+.newpt {
+  background-color: #9fb;
+}
+
 </style>
 
 </head>
@@ -68,7 +80,7 @@ $for i in range(len(appts)):
     hour = dt.hour + float(dt.minute)/60
     duration = a.duration
 
-  <div class="appt" style="top: $('%.2f'%hourtop(hour))%; height: $('%.1f'%hourheight(duration))%;">
+  <div class="appt $a.kind" style="top: $('%.2f'%hourtop(hour))%; height: $('%.1f'%hourheight(duration))%;">
     <span style="font-size: 90%;">$dt.hour:$('%02d' % dt.minute)</span>
     <span style="font-size: 110%;">
       <a href="/pt/$p.id/">$model.pt_name(p)</a>

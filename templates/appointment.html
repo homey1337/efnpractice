@@ -42,13 +42,14 @@ $# TODO: all this needs to be editable (!)
     <span>$appt.note</span>
   </div>
   <div>
+    <span></span>
+    <span><a href="/editappt/$journal.id">edit</a></span>
+  </div>
+  <div>
     <span>Treatments</span>
     <span>
       $ total = 0.0
       <div id="txplan">
-      <div>
-	<span><a href="/appointment/$journal.id/tx">change</a></span>
-      </div>
       $for tx in txs:
         <div class="tx">
 	  <span>$tx.summary</span>
@@ -61,6 +62,10 @@ $# TODO: all this needs to be editable (!)
       </div>
       </div>
     </span>
+  </div>
+  <div>
+    <span></span>
+    <span><a href="/appointment/$journal.id/tx">edit tx</a></span>
   </div>
 </div>
 
