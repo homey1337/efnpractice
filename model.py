@@ -148,7 +148,7 @@ def update_pt(f, resparty):
     d['resparty'] = resparty
     db.query('insert or replace into patient values ($id, $firstname, $middlename, $lastname, $resparty, $birthday)', d)
     row = db.query('select last_insert_rowid() as id')[0]
-    if d['id'] is None:
+    if d['id'] is None and d['resparty'] is None:
         db.update('patient', where='id=%d' % row.id, resparty=row.id)
     return row.id
 
