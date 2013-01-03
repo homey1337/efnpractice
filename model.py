@@ -42,7 +42,8 @@ schema = [
     ' (journalid integer primary key,'
     '  duration integer,'
     '  status string,'
-    '  kind string)',
+    '  kind string,'
+    '  note text)',
 
     'create table if not exists progress'
     ' (journalid integer primary key,'

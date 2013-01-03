@@ -8,11 +8,11 @@ class oneday:
     def GET(self, dtstring):
         dt = model.from_dt_string(dtstring, '%Y-%m-%d', model.tz)
         appts = model.appts_on_day(dt)
-        journals = list()
-        pts = list()
+        pts = dict()
+        ps = list()
         for a in appts:
-            j = model.get_journal_entry(a.journalid)
-            p = model.get_pt(j.patientid)
-            journals.append(j)
-            pts.append(p)
-        return hello.render.oneday(journals,appts,pts)
+            if a.patientid not in pts:
+                p = model.get_pt(a.patientid)
+                pts[a.patientid] = p
+            ps.append(pts[a.patientid])
+        return hello.render.oneday(appts,ps)
