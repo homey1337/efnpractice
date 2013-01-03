@@ -7,11 +7,6 @@ import config
 
 db = web.database(dbn='sqlite', db='dp.sqlite')
 
-# TODO: belongs in config file
-tz = pytz.timezone('US/Central')
-db_fmt = '%Y-%m-%d %H:%M:%S.%f'
-display_fmt = '%Y-%m-%d %H:%M (%Z)'
-
 
 # =================================================================
 # schema
@@ -153,12 +148,15 @@ def update_pt(f, resparty):
     return row.id
 
 def get_latest_address(patientid):
-    # TODO: should go to responsible party if pt doesn't have an address
-    addresses = db.where('journal', kind='address', patientid=patientid, order='id DESC')
+    addresses = db.where('journal', kind='address', patientid=patientid, order='ts DESC')
     try:
         return addresses[0]
     except IndexError:
-        return None
+        pt = get_pt(patientid)
+        if pt.resparty != pt.id:
+            return get_latest_address(pt.resparty)
+        else:
+            return None
 
 
 # pt
@@ -229,8 +227,15 @@ def new_journal(pt, kind, f):
     getattr(new_handlers, kind)(journalid, f)
 
 def get_journal(patientid, **kw):
-    # TODO: make sure the only keys in kw are limit and offset
-    return db.where('journal', order='ts DESC', patientid=patientid, **kw).list()
+    d = dict()
+    if 'limit' in kw:
+        d['limit'] = kw.pop('limit')
+    if 'offset' in kw:
+        d['offset'] = kw.pop('offset')
+    if len(kw):
+        raise ValueError('cannot handle keyword arguments other than limit and offset')
+
+    return db.where('journal', order='ts DESC', patientid=patientid, **d).list()
 
 def get_journal_entry(journalid):
     return db.where('journal', id=journalid)[0]
