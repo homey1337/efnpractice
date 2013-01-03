@@ -61,9 +61,12 @@ $for i in range(len(journals)):
 
   <div class="appt" style="top: $('%.2f'%hourtop(hour))%; height: $('%.1f'%hourheight(duration))%;">
     <span style="font-size: 90%;">$dt.hour:$('%02d' % dt.minute)</span>
-    <span style="font-size: 110%;">$model.pt_name(p)</span>
-    <br/>
-    <span>$a.summary</span>
+    <span style="font-size: 110%;">
+      <a href="/pt/$p.id/">$model.pt_name(p)</a>
+    </span>
+    <span>
+      <a href="/appointment/$a.journalid">$a.summary</a>
+    </span>
   </div>
 
 </body>
