@@ -1,0 +1,70 @@
+$def with (journals,appts,pts)
+
+<html>
+<head>
+
+<title>One Day</title>
+
+<style type="text/css">
+
+body {
+  font-size: 50%;
+}
+
+#schedule {
+  width: 21%;
+}
+
+.time {
+  text-align: right;
+  width: 10%;
+  position: absolute;
+  left: 0px;
+}
+
+.appt {
+  width: 79%;
+  position: absolute;
+  left: 11%;
+
+  background-color: orange;
+  border: 1px solid black;
+  overflow: hidden;
+}
+
+</style>
+
+</head>
+<body>
+
+$code
+  firsthour = 8
+  lasthour = 19
+
+  def hourtop(h):
+    return (float(h)-firsthour)/(lasthour-firsthour+1)*100
+
+  def hourheight(duration):
+    return (duration/60.0)/(lasthour-firsthour+1)*100
+
+$for hour in range(firsthour, lasthour+1):
+  <div class="time" style="top: $('%.1f'%hourtop(hour))%;">$hour:00</div>
+
+$for i in range(len(journals)):
+  $code
+    j = journals[i]
+    a = appts[i]
+    p = pts[i]
+    dt = model.from_dt_string(j.ts).astimezone(model.tz)
+    hour = dt.hour + float(dt.minute)/60
+    duration = a.duration
+
+  <div class="appt" style="top: $('%.2f'%hourtop(hour))%; height: $('%.1f'%hourheight(duration))%;">
+    <span style="font-size: 90%;">$dt.hour:$('%02d' % dt.minute)</span>
+    <span style="font-size: 110%;">$model.pt_name(p)</span>
+    <br/>
+    <span>$a.summary</span>
+  </div>
+
+</body>
+</html>

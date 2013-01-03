@@ -32,6 +32,7 @@ urls = (
     '/appointment/(.*)/tx', 'txplan.edit_appt',
     '/appointment/(.*)', 'show_journal',
     '/txplan/(.*)', 'txplan.show',
+    '/oneday/(.*)', 'schedule.oneday',
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!

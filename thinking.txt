@@ -1,3 +1,53 @@
+02 Jan 2013
+
+have achieved a decent intermediate product
+
+need to work on spit and polish at some point. I think there should be
+a top bar on most pages that shows the current patient under
+consideration and permits searching for a new patient and such
+(similar to the bar on top of pt.html).
+
+there is currently minimal styling being employed; a designer should
+go over the pages and apply a bit more, tastefully, so things look
+pretty.
+
+next steps are visual appointment display.
+
+then insurance processing.
+
+need a fee schedule and use that to preload tx plan items.
+
+a way to edit treatment items (especially to change fee).
+
+consider adding to tx fields for allowable, insurance payment, patient
+payment ...
+
+want to update name handling: no reason to have separate
+first/middle/last name fields, should have a single name
+field. searching will split whatever is typed in on spaces and search
+for 'name LIKE %frag1% AND name LIKE %frag2%'. this will let us handle
+whatever names and initials people throw at us, and include "goes by"
+names handily.
+
+easily-edited notes field in the patient record, to allow things that
+are currently handled with flash alerts.
+
+
+26 Dec 2012
+
+in order to efficiently generate the journal display, each entry has a
+summary recorded in the main "journal" table. then details can be
+generated (when requested or needed, e.g. for "detailed" views or
+printed reports) with another request to the appropriate table(s) for
+additional information.
+
+for simple entries of course all the information can be in the summary
+(e.g. phone numbers, e-mails, addresses).
+
+adding a new patient is the same as editing a patient with nil as the
+id.
+
+
 23 Dec 2012
 
 we only need to keep track of two basic things; patients and journals
@@ -34,17 +84,3 @@ a journal has all the information about a patient in dated entries
 * contact (record of a phone call or email exchange or etc)
 
 * doc (scanned piece of paper)
-
-26 Dec 2012
-
-in order to efficiently generate the journal display, each entry has a
-summary recorded in the main "journal" table. then details can be
-generated (when requested or needed, e.g. for "detailed" views or
-printed reports) with another request to the appropriate table(s) for
-additional information.
-
-for simple entries of course all the information can be in the summary
-(e.g. phone numbers, e-mails, addresses).
-
-adding a new patient is the same as editing a patient with nil as the
-id.
