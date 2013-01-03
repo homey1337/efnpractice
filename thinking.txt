@@ -32,6 +32,13 @@ names handily.
 easily-edited notes field in the patient record, to allow things that
 are currently handled with flash alerts.
 
+easily-edited notes field for appointments to communicate
+appointment-specific information between team members. a way to edit
+appointments period (fixing time/date and confirmation status, for
+example).
+
+review the database schema considering indexes.
+
 
 26 Dec 2012
 

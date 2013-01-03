@@ -16,7 +16,10 @@ $# TODO: all this needs to be editable (!)
   </div>
   <div>
     <span>When</span>
-    <span>$model.display_dt_string(model.from_dt_string(journal.ts))</span>
+    <span>
+      $ dt = model.from_dt_string(journal.ts).astimezone(model.tz)
+      <a href="/oneday/$dt.strftime('%Y-%m-%d')">$model.display_dt_string(dt)</a>
+    </span>
   </div>
   <div>
     <span>Length</span>
@@ -33,6 +36,10 @@ $# TODO: all this needs to be editable (!)
   <div>
     <span>Status</span>
     <span>$appt.status</span>
+  </div>
+  <div>
+    <span>Note</span>
+    <span>$appt.note</span>
   </div>
   <div>
     <span>Treatments</span>
