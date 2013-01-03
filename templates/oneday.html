@@ -69,14 +69,14 @@ $code
 $for hour in range(firsthour, lasthour+1):
   <div class="time" style="top: $('%.1f'%hourtop(hour))%;">$hour:00</div>
   <div class="newappt" style="top: $('%.1f'%hourtop(hour))%;">
-    <a href="/newappt?dt=$today.strftime('%Y-%m-%d')+$hour%3A00">new</a>
+    <a href="/newappt?dt=$model.display_date(today)+$hour%3A00">new</a>
   </div>
 
 $for i in range(len(appts)):
   $code
     a = appts[i]
     p = pts[i]
-    dt = model.from_dt_string(a.ts).astimezone(model.tz)
+    dt = model.load_datetime(a.ts).astimezone(model.tz)
     hour = dt.hour + float(dt.minute)/60
     duration = a.duration
 

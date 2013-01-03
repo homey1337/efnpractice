@@ -3,6 +3,7 @@ import datetime
 import pytz
 import web
 
+import config
 
 db = web.database(dbn='sqlite', db='dp.sqlite')
 
@@ -79,18 +80,36 @@ def create_schema():
 def current_time():
     return datetime.datetime.now(pytz.utc)
 
-def to_dt_string(dt):
-    return dt.strftime(db_fmt)
+def input_date(s):
+    return datetime.datetime.strptime(s, config.date_fmt).replace(tzinfo=config.tz).astimezone(pytz.utc)
 
-def from_dt_string(s, fmt=None, tz=None):
-    if not fmt:
-        fmt = db_fmt
-    if not tz:
-        tz = pytz.utc
-    return datetime.datetime.strptime(s, fmt).replace(tzinfo=tz)
+def display_date(dt):
+    return dt.astimezone(config.tz).strftime(config.date_fmt)
 
-def display_dt_string(dt):
-    return dt.astimezone(tz).strftime(display_fmt)
+def input_datetime(s):
+    return datetime.datetime.strptime(s, config.datetime_fmt).replace(tzinfo=config.tz).astimezone(pytz.utc)
+
+def display_datetime(dt):
+    return dt.astimezone(config.tz).strftime(config.datetime_fmt)
+
+def store_datetime(dt):
+    return dt.strftime(config.db_fmt)
+
+def load_datetime(s):
+    return datetime.datetime.strptime(s, config.db_fmt).replace(tzinfo=pytz.utc)
+
+# def to_dt_string(dt):
+#     return dt.strftime(db_fmt)
+
+# def from_dt_string(s, fmt=None, tz=None):
+#     if not fmt:
+#         fmt = db_fmt
+#     if not tz:
+#         tz = pytz.utc
+#     return datetime.datetime.strptime(s, fmt).replace(tzinfo=tz)
+
+# def display_dt_string(dt):
+#     return dt.astimezone(tz).strftime(display_fmt)
 
 
 # schema
@@ -196,23 +215,23 @@ class new_handlers (web.storage):
     def appointment(journalid, form):
         # TODO should appointments in the past be legal? how to fail?
         #  ... transactions!
-        dt = from_dt_string(form.dt.get_value(), "%Y-%m-%d %H:%M", tz).astimezone(pytz.utc)
+        dt = input_datetime(form.dt.get_value())
         duration = int(form.duration.get_value())
         kind = form.kind.get_value()
         db.insert('appointment', journalid=journalid, duration=duration, kind=kind)
-        db.update('journal', where=('id=%d' % journalid), ts=to_dt_string(dt))
+        db.update('journal', where=('id=%d' % journalid), ts=store_datetime(dt))
 
 def new_journal(pt, kind, f):
     journalid = db.insert('journal',
                           patientid = pt.id,
-                          ts = to_dt_string(current_time()),
+                          ts = store_datetime(current_time()),
                           kind = kind,
                           summary = f.summary.get_value())
     getattr(new_handlers, kind)(journalid, f)
 
 def get_journal(patientid, **kw):
     # TODO: make sure the only keys in kw are limit and offset
-    return db.where('journal', order='id DESC', patientid=patientid, **kw).list()
+    return db.where('journal', order='ts DESC', patientid=patientid, **kw).list()
 
 def get_journal_entry(journalid):
     return db.where('journal', id=journalid)[0]
@@ -272,14 +291,14 @@ def appts_on_day(dt):
 
     return db.select(['journal','appointment'],
                      where=Q(['journal.kind=',P('appointment'),
-                              'and ts>',P(to_dt_string(start_day)),
-                              'and ts<',P(to_dt_string(end_day)),
+                              'and ts>',P(store_datetime(start_day)),
+                              'and ts<',P(store_datetime(end_day)),
                               'and journal.id=appointment.journalid']),
                      order='ts ASC').list()
 
 def new_appt(patientid, dt, **kw):
     at = dt.replace(second=0, microsecond=0, minute=(dt.minute - dt.minute%10)).astimezone(pytz.utc)
-    journalid = db.insert('journal', patientid=patientid, ts=to_dt_string(at), kind='appointment', summary=kw.get('summary','test'))
+    journalid = db.insert('journal', patientid=patientid, ts=store_datetime(at), kind='appointment', summary=kw.get('summary','test'))
     if 'summary' in kw:
         kw.pop('summary')
     return db.insert('appointment', journalid=journalid, **kw)

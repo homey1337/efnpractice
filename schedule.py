@@ -6,7 +6,7 @@ import web
 
 class oneday:
     def GET(self, dtstring):
-        dt = model.from_dt_string(dtstring, '%Y-%m-%d', model.tz)
+        dt = model.input_date(dtstring)
         appts = model.appts_on_day(dt)
         pts = dict()
         ps = list()

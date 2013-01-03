@@ -223,15 +223,14 @@ class show_journal:
 class new_appointment:
     def GET(self, id=None):
         f = forms.newappt()
-        fmt = '%Y-%m-%d %H:%M'
         if id is None:
             dt = model.current_time()
             dt = dt.replace(minute=(dt.minute - dt.minute % 10),
                             second=0, microsecond=0)
-            inp = web.input(dt=dt.astimezone(model.tz).strftime(fmt),
+            inp = web.input(dt=model.display_datetime(dt),
                             pt='')
-            dt = model.from_dt_string(inp.dt, fmt, model.tz)
-            f.dt.set_value(dt.astimezone(model.tz).strftime(fmt))
+            dt = model.input_datetime(inp.dt)
+            f.dt.set_value(model.display_datetime(model))
             f.pt.set_value(inp.pt)
         else:
             appt = model.get_appointment(id)
@@ -240,8 +239,8 @@ class new_appointment:
 
             f.pt.set_value(model.pt_name(pt, first='lastname'))
             f.summary.set_value(journal.summary)
-            dt = model.from_dt_string(journal.ts)
-            f.dt.set_value(dt.astimezone(model.tz).strftime(fmt))
+            dt = model.load_datetime(journal.ts)
+            f.dt.set_value(model.display_datetime(dt))
             f.duration.set_value('%s'%appt.duration)
             f.kind.set_value(appt.kind)
             f.notes.set_value(appt.note)
@@ -253,7 +252,7 @@ class new_appointment:
         if f.validates():
             pt = model.pt_name_search(f.pt.get_value())[0]
             summary = f.summary.get_value()
-            dt = model.from_dt_string(f.dt.get_value(), '%Y-%m-%d %H:%M', model.tz).astimezone(pytz.utc)
+            dt = model.input_datetime(f.dt.get_value())
             duration = int(f.duration.get_value())
             kind = f.kind.get_value()
             note = f.notes.get_value()
@@ -272,7 +271,7 @@ class new_appointment:
                                 note=note)
                 model.db.update('journal',
                                 where='id=%d' % appointmentid,
-                                ts=model.to_dt_string(dt),
+                                ts=model.store_datetime(dt),
                                 patientid=pt.id,
                                 summary=summary)
             raise web.seeother('/appointment/%d' % appointmentid)

@@ -53,7 +53,7 @@ $def with (form, pt, resparty, journal)
 </div>
 
 $ future = True
-$ tomorrow = model.to_dt_string((datetime.datetime.now(tz=model.tz).replace(hour=0,minute=0,second=0,microsecond=0)+datetime.timedelta(seconds=86400)).astimezone(pytz.utc))
+$ tomorrow = model.store_datetime((datetime.datetime.now(tz=model.tz).replace(hour=0,minute=0,second=0,microsecond=0)+datetime.timedelta(seconds=86400)).astimezone(pytz.utc))
 $ balance = 0.0
 <div id="journal">
 $for entry in journal:
@@ -61,7 +61,7 @@ $for entry in journal:
     <hr/>
     $ future = False
   <div class="$entry.kind">
-    <span>$model.display_dt_string(model.from_dt_string(entry.ts))</span>
+    <span>$model.display_datetime(model.load_datetime(entry.ts))</span>
     <span><a href="/journal/$entry.id">$entry.kind</a></span>
     <span>$entry.summary</span>
     $if entry.money:

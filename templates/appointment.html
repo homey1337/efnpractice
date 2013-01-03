@@ -17,8 +17,8 @@ $# TODO: all this needs to be editable (!)
   <div>
     <span>When</span>
     <span>
-      $ dt = model.from_dt_string(journal.ts).astimezone(model.tz)
-      <a href="/oneday/$dt.strftime('%Y-%m-%d')">$model.display_dt_string(dt)</a>
+      $ dt = model.load_datetime(journal.ts)
+      <a href="/oneday/$model.display_date(dt)">$model.display_datetime(dt)</a>
     </span>
   </div>
   <div>

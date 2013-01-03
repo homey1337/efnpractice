@@ -12,7 +12,7 @@ $def with (journal, contact, pt)
 <div id="contact">
   <div class="when">
     <span>When</span>
-    <span>$model.display_dt_string(model.from_dt_string(journal.ts))</span>
+    <span>$model.display_datetime(model.load_datetime(journal.ts))</span>
   </div>
   <div class="summary">
     <span>Summary</span>
