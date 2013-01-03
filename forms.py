@@ -37,6 +37,16 @@ def _rp_is_unique_pt(i):
         return True
 names_unique_pt = Validator("doesn't name a unique patient", _rp_is_unique_pt)
 
+newappt = Form(
+    Textbox('pt', names_unique_pt, description='Patient'),
+    Textbox('summary', not_empty, description='Summary'),
+    Textbox('dt', looks_like_dt, description='When'),
+    Textbox('duration', looks_like_number, description='Length'),
+    Textbox('kind', not_empty, description='Kind'),
+    Textarea('notes', description='Note'),
+    Button('submit', type='submit', html='New')
+)
+
 patient = Form(
     Hidden('id'),
     Hidden('resparty'),

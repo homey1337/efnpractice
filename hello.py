@@ -28,6 +28,8 @@ urls = (
     '/edit/(.*)/', 'edit_patient',
     '/edit/(.*)', 'edit_patient',
     '/newpt', 'edit_patient',
+    '/newappt', 'new_appointment',
+    '/editappt/(.*)', 'new_appointment',
     '/journal/(.*)', 'show_journal',
     '/appointment/(.*)/tx', 'txplan.edit_appt',
     '/appointment/(.*)', 'show_journal',
@@ -217,6 +219,65 @@ class show_journal:
         journal = model.get_journal_entry(id)
         return getattr(view_handlers, journal.kind)(journal)
 
+
+class new_appointment:
+    def GET(self, id=None):
+        f = forms.newappt()
+        fmt = '%Y-%m-%d %H:%M'
+        if id is None:
+            dt = model.current_time()
+            dt = dt.replace(minute=(dt.minute - dt.minute % 10),
+                            second=0, microsecond=0)
+            inp = web.input(dt=dt.astimezone(model.tz).strftime(fmt),
+                            pt='')
+            dt = model.from_dt_string(inp.dt, fmt, model.tz)
+            f.dt.set_value(dt.astimezone(model.tz).strftime(fmt))
+            f.pt.set_value(inp.pt)
+        else:
+            appt = model.get_appointment(id)
+            journal = model.get_journal_entry(id)
+            pt = model.get_pt(journal.patientid)
+
+            f.pt.set_value(model.pt_name(pt, first='lastname'))
+            f.summary.set_value(journal.summary)
+            dt = model.from_dt_string(journal.ts)
+            f.dt.set_value(dt.astimezone(model.tz).strftime(fmt))
+            f.duration.set_value('%s'%appt.duration)
+            f.kind.set_value(appt.kind)
+            f.notes.set_value(appt.note)
+        return render.newappt(f)
+
+    def POST(self, id=None):
+        f = forms.newappt()
+        if f.validates():
+            pt = model.pt_name_search(f.pt.get_value())[0]
+            summary = f.summary.get_value()
+            dt = model.from_dt_string(f.dt.get_value(), '%Y-%m-%d %H:%M', model.tz).astimezone(pytz.utc)
+            duration = int(f.duration.get_value())
+            kind = f.kind.get_value()
+            note = f.notes.get_value()
+            if id is None:
+                appointmentid = model.new_appt(pt.id, dt,
+                                               summary=summary,
+                                               duration=duration,
+                                               kind=kind,
+                                               note=note)
+            else:
+                appointmentid = int(id)
+                model.db.update('appointment',
+                                where='journalid=%d' % appointmentid,
+                                duration=duration,
+                                kind=kind,
+                                note=note)
+                model.db.update('journal',
+                                where='id=%d' % appointmentid,
+                                ts=model.to_dt_string(dt),
+                                patientid=pt.id,
+                                summary=summary)
+            raise web.seeother('/appointment/%d' % appointmentid)
+        else:
+            return render.newappt(f)
+        
 
 if __name__ == "__main__":
     app.run()

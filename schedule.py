@@ -15,4 +15,4 @@ class oneday:
                 p = model.get_pt(a.patientid)
                 pts[a.patientid] = p
             ps.append(pts[a.patientid])
-        return hello.render.oneday(appts,ps)
+        return hello.render.oneday(dt,appts,ps)

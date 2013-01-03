@@ -279,7 +279,9 @@ def appts_on_day(dt):
 
 def new_appt(patientid, dt, **kw):
     at = dt.replace(second=0, microsecond=0, minute=(dt.minute - dt.minute%10)).astimezone(pytz.utc)
-    journalid = db.insert('journal', patientid=patientid, ts=to_dt_string(at), kind='appointment', summary='test')
+    journalid = db.insert('journal', patientid=patientid, ts=to_dt_string(at), kind='appointment', summary=kw.get('summary','test'))
+    if 'summary' in kw:
+        kw.pop('summary')
     return db.insert('appointment', journalid=journalid, **kw)
 
 def appt_tx_set(appointmentid, txs):
