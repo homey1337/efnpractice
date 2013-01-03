@@ -5,6 +5,26 @@ body {
     margin: 0ex;
 }
 
+/* tweaks for forms */
+
+input {
+    border: 1px solid #eee;
+}
+
+input[type=text] {
+    font-family: sans-serif;
+    width: 15em;
+}
+
+textarea {
+    font-family: sans-serif;
+    border: 1px solid #eee;
+    width: 15em;
+    height: 4em;
+    padding: 0;
+    vertical-align: text-top;
+}
+
 /* tweaks to links */
 
 a {
