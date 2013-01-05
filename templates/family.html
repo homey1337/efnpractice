@@ -1,4 +1,4 @@
-$def with (form, pts)
+$def with (pts)
 
 <html>
 <head>
@@ -7,15 +7,18 @@ $def with (form, pts)
 </head>
 <body>
 
-<form class="nolabels" method="POST">
-$:form.render_css()
-</form>
+<div id="topbar">
+  <form class="nolabels" method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit" name="submit">search</button>
+  </form>
+</div>
 
 <div id="ptlist">
 $for pt in pts:
   <div class="familymember">
     <span>
-      <a href="/pt/$pt.id">$model.pt_name(pt)</a>
+      <a href="/patient/$pt.id">$model.pt_name(pt)</a>
     </span>
     <span>$pt.birthday</span>
   </div>

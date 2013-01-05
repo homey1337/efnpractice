@@ -1,0 +1,46 @@
+#topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* arrrgh height doesn't quite scale nicely with font changes because of the button */
+}
+
+.time {
+    text-align: right;
+    width: 5ex;
+    position: absolute;
+    left: 0px;
+}
+
+.newappt {
+    position: absolute;
+    left: 6ex;
+    right: 3ex;
+}
+
+.appt {
+    position: absolute;
+    left: 6ex;
+
+    background-color: orange;
+    border: 1px solid black;
+    overflow: hidden;
+}
+
+.avail {
+    background-color: #ddd;
+    border: none;
+}
+
+.test {
+    background-color: #fb9;
+}
+
+.tx {
+    background-color: #b9f;
+}
+
+.newpt {
+    background-color: #9fb;
+}

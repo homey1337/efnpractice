@@ -1,4 +1,4 @@
-$def with (journal, appt, pt, txs)
+$def with (journal, appt, pt, form, txs)
 
 <html>
 <head>
@@ -7,65 +7,64 @@ $def with (journal, appt, pt, txs)
 </head>
 <body>
 
-<div id="appt">
-  <div>
-    <span>Who</span>
-    <span><a href="/pt/$pt.id">$model.pt_name(pt)</a></span>
-  </div>
-  <div>
-    <span>When</span>
-    <span>
-      $ dt = model.load_datetime(journal.ts)
-      <a href="/oneday/$model.display_date(dt)">$model.display_datetime(dt)</a>
-    </span>
-  </div>
-  <div>
-    <span>Length</span>
-    <span>$appt.duration</span>
-  </div>
-  <div>
-    <span>Summary</span>
-    <span>$journal.summary</span>
-  </div>
-  <div>
-    <span>Kind</span>
-    <span>$appt.kind</span>
-  </div>
-  <div>
-    <span>Status</span>
-    <span>$appt.status</span>
-  </div>
-  <div>
-    <span>Note</span>
-    <span>$appt.note</span>
-  </div>
-  <div>
-    <span></span>
-    <span><a href="/editappt/$journal.id">edit</a></span>
-  </div>
-  <div>
-    <span>Treatments</span>
-    <span>
-      $ total = 0.0
-      <div id="txplan">
-      $for tx in txs:
-        <div class="tx">
-	  <span>$tx.summary</span>
-	  $ total += tx.fee
-	  <span class="money">$('$ %.2f' % tx.fee)</span>
-	</div>
-      <div class="total">
-	<span>total</span>
-	<span class="money">$('$ %.2f' % total)</span>
-      </div>
-      </div>
-    </span>
-  </div>
-  <div>
-    <span></span>
-    <span><a href="/appointment/$journal.id/tx">edit tx</a></span>
-  </div>
+<div id="topbar">
+  <a href="/patient/$pt.id">$pt.name</a>
+  <form method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit">search</button>
+  </form>
 </div>
+
+<form method="POST">
+  <div id="appt">
+    $for input in form.inputs:
+      $if input.is_hidden():
+        $:input.render()
+      $else:
+        <div>
+	  <span>$input.description</span>
+	  <span>$:input.render()</span>
+	  <span>$input.note</span>
+	  $if input.name == 'ts':
+	    <span>
+	      <a href="/oneday/$model.display_date(model.input_datetime(input.get_value()))">day</a>
+	    </span>
+	</div>
+    <div>
+      <span>Treatments</span>
+      <span>
+	$ total = 0.0
+	<div id="txplan">
+	  $for tx in txs:
+            <div class="tx">
+	      <span>
+              $if appt and tx.appointmentid == appt.journalid:
+		<input type="checkbox" name="txs" value="$tx.id" checked="checked"/>
+	      $else:
+		<input type="checkbox" name="txs" value="$tx.id"/>
+	      </span>
+	      <span>$tx.summary</span>
+	      $ total += tx.fee
+	      <span class="money">$('$ %.2f' % tx.fee)</span>
+	      <span>$model.tx_status(tx)</span>
+	    </div>
+	  <div>
+	    <span></span>
+	    <span class="total">total</span>
+	    <span class="total money">$('$ %.2f' % total)</span>
+	  </div>
+	</div>
+      </span>
+    </div>
+    <div>
+      <span></span>
+      <span>
+	<button type="submit" name="submit" value="save">save</button>
+	<button type="submit" name="submit" value="post">post</button>
+      </span>
+    </div>
+  </div>
+</form>
 
 </body>
 </html>

@@ -11,23 +11,23 @@ $def with (journal, progress, pt)
 
 <div id="progress">
   <div class="when">
-    <span>When</span>
+    <span>progress</span>
     <span>$model.display_datetime(model.load_datetime(journal.ts))</span>
   </div>
   <div class="sub">
-    <span>Subjective</span>
+    <span>subjective</span>
     <span>$:progress.sub.replace('\n','<br/>')</span>
   </div>
   <div class="obj">
-    <span>Objective</span>
+    <span>objective</span>
     <span>$:progress.obj.replace('\n','<br/>')</span>
   </div>
   <div class="ass">
-    <span>Assessment</span>
+    <span>assessment</span>
     <span>$:progress.ass.replace('\n','<br/>')</span>
   </div>
   <div class="pln">
-    <span>Plan</span>
+    <span>plan</span>
     <span>$:progress.pln.replace('\n','<br/>')</span>
   </div>
 </div>

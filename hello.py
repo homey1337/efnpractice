@@ -12,6 +12,7 @@ import pytz
 import web
 
 # my imports
+import config
 import forms
 import model
 
@@ -21,36 +22,25 @@ import model
 
 urls = (
     '/', 'index',
+    # the search patient form action
+    '/searchpt', 'searchpt',
+    # patients and families
     '/family/(.*)', 'family',
-    '/pt/(.*)/new/(.*)', 'new_journal',
-    '/pt/(.*)/', 'patient',
-    '/pt/(.*)', 'patient_bounce',
-    '/edit/(.*)/', 'edit_patient',
-    '/edit/(.*)', 'edit_patient',
-    '/newpt', 'edit_patient',
-    '/newappt', 'new_appointment',
-    '/editappt/(.*)', 'new_appointment',
+    '/patient/(.*)', 'edit_patient',
+    '/new/patient', 'edit_patient',
+    # appointments
+    '/new/appointment', 'show_journal',
+    # other journal entries
+    '/new/(.*)', 'edit_journal',
     '/journal/(.*)', 'show_journal',
-    '/appointment/(.*)/tx', 'txplan.edit_appt',
-    '/appointment/(.*)', 'show_journal',
+    # treatment plan
     '/txplan/(.*)', 'txplan.show',
+    # schedule
     '/oneday/(.*)', 'schedule.oneday',
+    '/today', 'schedule.today',
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!
-
-
-# how to search for patients ... can come from multiple places
-
-def POST_search_for_patient():
-    f = forms.search()
-    f.validates()
-    q = ' '.join(f.query.get_value().split())
-    pts = model.pt_name_search(q)
-    if len(pts) == 1:
-        raise web.seeother('/pt/%d/' % pts[0].id)
-    else:
-        return render.family(f, pts)
 
 
 # ye olde index
@@ -58,64 +48,55 @@ def POST_search_for_patient():
 class index:
     def GET(self):
         # other useful things; recent journal entries
-        return render.index(forms.search())
+        return render.index()
 
+
+class searchpt:
     def POST(self):
-        return POST_search_for_patient()
+        f = forms.search()
+        f.validates()
+        q = ' '.join(f.query.get_value().split())
+        pts = model.pt_name_search(q)
+        if len(pts) == 0:
+            return render.family(list())
+        elif len(pts) == 1:
+            raise web.seeother('/patient/%d' % pts[0].id)
+        else:
+            return render.family(pts)
 
 
 # a list of multiple patients ... generally relatives
 
 class family:
     def GET(self, patientid):
-        return render.family(forms.search(), model.get_family(patientid))
-
-    def POST(self, patientid):
-        return POST_search_for_patient()
-
-
-# patient display
-
-class patient_bounce:
-    def GET(self, x):
-        raise web.seeother('/pt/%s/' % x)
-
-class patient:
-    def GET(self, patientid):
-        pt = model.get_pt(patientid)
-        if pt.resparty:
-            resparty = model.get_pt(pt.resparty)
-        else:
-            resparty = pt
-        journal = model.get_journal(pt.id)
-
-        return render.pt(forms.search(), pt, resparty, journal)
-
-    def POST(self, patientid):
-        return POST_search_for_patient()
+        return render.family(model.get_family(patientid))
 
 
 # patient edit
 
 class edit_patient:
     def GET(self, patientid=''):
-        if patientid:
-            pt = model.get_pt(patientid)
-        else:
-            pt = None
+        ptform = forms.patient()
 
-        f = forms.patient()
-        if pt:
+        if patientid:
+            patientid = int(patientid)
+            journal = model.get_journal(patientid)
+            pt = model.get_pt(patientid)
             for key in pt:
-                f[key].set_value(pt[key])
+                ptform[key].set_value(pt[key])
 
             if pt.resparty:
                 rp = model.get_pt(pt.resparty)
-                f.resparty_text.set_value(model.pt_name(rp, first='lastname'))
+                ptform.resparty_text.set_value(model.pt_name(rp, first='lastname'))
             else:
-                f.resparty_text.set_value(model.pt_name(pt, first='lastname'))
+                rp = None
+                ptform.resparty_text.set_value(model.pt_name(pt, first='lastname'))
+        else:
+            pt = None
+            journal = None
+            rp = None
 
-        return render.edit_patient(f)
+        return render.patient(pt, ptform, rp, journal)
 
     def POST(self, patientid=''):
         f = forms.patient()
@@ -133,20 +114,24 @@ class edit_patient:
                 resparty = None
 
             newid = model.update_pt(f, resparty)
-            raise web.seeother('/pt/%d/' % newid)
+            raise web.seeother('/patient/%d' % newid)
 
 
-class new_journal:
-    def GET(self, patientid, kind):
+class edit_journal:
+    def GET(self, kind):
+        inp = web.input(pt=0)
+        patientid = int(inp.pt)
+        form = forms.journal[kind]
         pt = model.get_pt(patientid)
-        return render.journal(pt, kind, forms.journal[kind]())
+        form.patientid.set_value(pt.id)
+        return render.journal(pt, kind, form)
 
-    def POST(self, patientid, kind):
-        pt = model.get_pt(patientid)
+    def POST(self, kind):
         f = forms.journal[kind]()
         if f.validates():
+            pt = model.get_pt(int(f.patientid.get_value()))
             model.new_journal(pt, kind, f)
-            raise web.seeother('/pt/%d/' % pt.id)
+            raise web.seeother('/patient/%d' % pt.id)
         else:
             return render.journal(pt, kind, f)
 
@@ -194,11 +179,28 @@ class view_handlers (web.storage):
         return render.Rx(journal, Rx, pt, address)
 
     @staticmethod
-    def appointment(journal):
-        appt = model.get_appointment(journal.id)
-        pt = model.get_pt(journal.patientid)
-        txs = model.get_tx_for_appointment(appt.journalid)
-        return render.appointment(journal, appt, pt, txs)
+    def appointment(journal, form=None):
+        if journal:
+            appt = model.get_appointment(journal.id)
+            pt = model.get_pt(journal.patientid)
+            txs = model.get_tx_for_appointment(appt.journalid)
+        else:
+            inp = web.input(pt=0)
+            appt = None
+            pt = model.get_pt(int(inp.pt))
+            txs = model.get_txplan(int(inp.pt))
+        if not form:
+            form = forms.journal['appointment']()
+            if journal:
+                form['patientid'].set_value(str(pt.id))
+                form['journalid'].set_value(str(journal.id))
+                form['ts'].set_value(model.display_datetime(model.load_datetime(journal.ts)))
+                form['summary'].set_value(journal.summary)
+                form['status'].set_value(appt.status)
+                form['notes'].set_value(appt.notes)
+                form['kind'].set_value(appt.kind)
+                form['duration'].set_value(appt.duration)
+        return render.appointment(journal, appt, pt, form, txs)
 
     @staticmethod
     def doc(journal):
@@ -215,9 +217,37 @@ class view_handlers (web.storage):
 
 
 class show_journal:
-    def GET(self, id):
-        journal = model.get_journal_entry(id)
-        return getattr(view_handlers, journal.kind)(journal)
+    def GET(self, id=''):
+        if id:
+            journal = model.get_journal_entry(int(id))
+            return getattr(view_handlers, journal.kind)(journal)
+        else:
+            return getattr(view_handlers, 'appointment')(None)
+
+    def POST(self, id=''):
+        if id:
+            journal = model.get_journal_entry(int(id))
+        else:
+            journal = None
+        if not journal or journal.kind == 'appointment':
+            inp = web.input(txs=list()) # to pickup the custom txs field
+            form = forms.journal['appointment']()
+            if form.validates():
+                if id:
+                    model.update_appt(journal.id, form)
+                else:
+                    pt = model.get_pt(int(form.patientid.get_value()))
+                    journalid = model.new_journal(pt, 'appointment', form)
+                    journal = model.get_journal_entry(journalid)
+                txs = list()
+                for tx in inp.txs:
+                    txs.append(int(tx))
+                model.appt_tx_set(journal.id, txs)
+                return view_handlers.appointment(model.get_journal_entry(journal.id))
+            else:
+                return view_handlers.appointment(journal, form)
+        else:
+            return getattr(view_handlers, journal.kind)(journal)
 
 
 class new_appointment:

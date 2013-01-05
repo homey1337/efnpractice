@@ -3,6 +3,7 @@
 body {
     padding: 0ex;
     margin: 0ex;
+    font-size: 10pt;
 }
 
 /* tweaks for forms */
@@ -23,6 +24,11 @@ textarea {
     height: 4em;
     padding: 0;
     vertical-align: text-top;
+}
+
+button {
+    font-family: sans-serif;
+    font-size: 10pt;
 }
 
 /* tweaks to links */

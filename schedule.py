@@ -16,3 +16,8 @@ class oneday:
                 pts[a.patientid] = p
             ps.append(pts[a.patientid])
         return hello.render.oneday(dt,appts,ps)
+
+
+class today:
+    def GET(self):
+        raise web.seeother('/oneday/%s' % model.display_date(model.current_time()))

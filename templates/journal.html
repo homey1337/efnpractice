@@ -7,7 +7,13 @@ $def with (pt, kind, form)
 </head>
 <body>
 
-<h1>New $kind.capitalize() for $model.pt_name(pt)</h1>
+<div id="topbar">
+  <a href="/patient/$pt.id">$pt.name</a>
+  <form method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit" name="submit">search</button>
+  </form>
+</div>
 
 <form method="POST" enctype="multipart/form-data">
   $for input in form.inputs:

@@ -1,99 +1,64 @@
 $def with (today,appts,pts)
 $# appts here is already a join of appointment & journal
-$# TODO make this prettier, push the css into another file, etc
+$# TODO give this a top bar
+$# TODO display dates at the top of columns
+$# TODO generalize to multiple days
 
 <html>
 <head>
 
 <title>One Day</title>
-
-<style type="text/css">
-
-body {
-  font-size: 50%;
-}
-
-#schedule {
-  width: 21%;
-}
-
-.time {
-  text-align: right;
-  width: 10%;
-  position: absolute;
-  left: 0px;
-}
-
-.newappt {
-  width: 79%;
-  position: absolute;
-  left: 11%;
-}
-
-.appt {
-  width: 79%;
-  position: absolute;
-  left: 11%;
-
-  background-color: orange;
-  border: 1px solid black;
-  overflow: hidden;
-}
-
-.test {
-  background-color: #fb9;
-}
-
-.tx {
-  background-color: #b9f;
-}
-
-.newpt {
-  background-color: #9fb;
-}
-
-</style>
+<link rel="stylesheet" href="/static/dp.css"/>
+<link rel="stylesheet" href="/static/calendar.css"/>
 
 </head>
 <body>
 
 $code
-  firsthour = 8
-  lasthour = 19
+  firsthour = 0
+  lasthour = 23
 
   def hourtop(h):
-    return (float(h)-firsthour)/(lasthour-firsthour+1)*100
+    return '%.1fex' % (6 + 6*h)
 
   def hourheight(duration):
-    return (duration/60.0)/(lasthour-firsthour+1)*100
+    return '%.1fex' % (duration / 10.0)
 
 $for hour in range(firsthour, lasthour+1):
-  <div class="time" style="top: $('%.1f'%hourtop(hour))%;">$hour:00</div>
-  <div class="newappt" style="top: $('%.1f'%hourtop(hour))%;">
-    <a href="/newappt?dt=$model.display_date(today)+$hour%3A00">new</a>
-  </div>
+  <div class="time" style="top: $(hourtop(hour));">$hour:00</div>
+
+<div class="appt avail" style="top: $(hourtop(8)); height: $(hourheight(4*60)); right: 6ex;">
+</div>
+<div class="appt avail" style="top: $(hourtop(13)); height: $(hourheight(4*60)); right: 6ex;">
+</div>
 
 $for i in range(len(appts)):
   $code
     a = appts[i]
     p = pts[i]
-    dt = model.load_datetime(a.ts).astimezone(model.tz)
+    dt = model.load_datetime(a.ts).astimezone(config.tz)
     hour = dt.hour + float(dt.minute)/60
     duration = a.duration
 
-  <div class="appt $a.kind" style="top: $('%.2f'%hourtop(hour))%; height: $('%.1f'%hourheight(duration))%;">
-    <span style="font-size: 90%;">$dt.hour:$('%02d' % dt.minute)</span>
+  <div class="appt $a.kind" style="top: $(hourtop(hour)); height: $(hourheight(duration)); right: 6ex;">
+    <span style="font-size: 90%;">$dt.strftime('%H:%M')</span>
     <span style="font-size: 110%;">
-      <a href="/pt/$p.id/">$model.pt_name(p)</a>
+      <a href="/patient/$p.id">$model.pt_name(p)</a>
     </span>
     <span>
-      <a href="/appointment/$a.journalid">$a.summary</a>
+      <a href="/journal/$a.journalid">$a.summary</a>
     </span>
-    <br/>
     <span>
-      $a.note
+      $a.notes
     </span>
   </div>
+
+<div id="topbar">
+  <form method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit">search</button>
+  </form>
+</div>
 
 </body>
 </html>

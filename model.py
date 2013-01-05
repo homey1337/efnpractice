@@ -13,14 +13,14 @@ db = web.database(dbn='sqlite', db='dp.sqlite')
 
 
 schema = [
-    # makes extensive use of automatic string concatenation by the parser
+    # making extensive use of automatic string concatenation by the parser
+
     'create table if not exists patient'
     ' (id integer primary key,'
-    '  firstname string,'
-    '  middlename string,'
-    '  lastname string,'
+    '  name string,'
     '  resparty integer references patient(id),'
-    '  birthday date)',
+    '  birthday date,'
+    '  notes text)',
 
     'create table if not exists journal'
     ' (id integer primary key,'
@@ -39,7 +39,7 @@ schema = [
     '  duration integer,'
     '  status string,'
     '  kind string,'
-    '  note text)',
+    '  notes text)',
 
     'create table if not exists progress'
     ' (journalid integer primary key,'
@@ -64,7 +64,9 @@ schema = [
     '  code integer,'
     '  tooth string,'
     '  surf string,'
-    '  fee currency)',
+    '  fee currency,'
+    '  inspaid currency,'
+    '  ptpaid currency)',
 ]
 
 def create_schema():
@@ -74,6 +76,9 @@ def create_schema():
 
 def current_time():
     return datetime.datetime.now(pytz.utc)
+
+def local_time():
+    return datetime.datetime.now(config.tz)
 
 def input_date(s):
     return datetime.datetime.strptime(s, config.date_fmt).replace(tzinfo=config.tz).astimezone(pytz.utc)
@@ -93,19 +98,6 @@ def store_datetime(dt):
 def load_datetime(s):
     return datetime.datetime.strptime(s, config.db_fmt).replace(tzinfo=pytz.utc)
 
-# def to_dt_string(dt):
-#     return dt.strftime(db_fmt)
-
-# def from_dt_string(s, fmt=None, tz=None):
-#     if not fmt:
-#         fmt = db_fmt
-#     if not tz:
-#         tz = pytz.utc
-#     return datetime.datetime.strptime(s, fmt).replace(tzinfo=tz)
-
-# def display_dt_string(dt):
-#     return dt.astimezone(tz).strftime(display_fmt)
-
 
 # schema
 # =================================================================
@@ -113,19 +105,31 @@ def load_datetime(s):
 
 
 def pt_name(pt, first='firstname'):
-    if first == 'lastname':
-        return '%s, %s %s' % (pt.lastname or '', pt.firstname or '', pt.middlename or '')
+    if pt:
+        return pt.name
     else:
-        return '%s %s %s' % (pt.firstname or '', pt.middlename or '', pt.lastname or '')
+        return ''
 
 def pt_name_search(q):
-    q = q.replace(',','%,').replace(', ',',').replace(' ','% ')
-    if not q:
-        return list()
-    else:
-        q += '%'
-    query = web.db.SQLQuery(["coalesce(lastname,'')||','||coalesce(firstname,'')||' '||coalesce(middlename,'') like ", web.db.sqlquote(q)])
-    return list(db.select('patient', where=query))
+    try:
+        id = int(q)
+        pt = get_pt(id)
+        if pt:
+            l = list()
+            l.append(get_pt(id))
+            return l
+        else:
+            return list()
+    except ValueError:
+        qs = q.split()
+        l = list()
+        for q in qs:
+            if l:
+                l.append(' and ')
+            l.append('name like ')
+            l.append(web.db.sqlquote('%%%s%%' % q))
+        query = web.db.SQLQuery(l)
+        return list(db.select('patient', where=query))
 
 def get_pt(id):
     try:
@@ -138,10 +142,10 @@ def get_family(resparty):
 
 def update_pt(f, resparty):
     d = dict([(k, f[k].get_value())
-              for k in 'firstname','middlename','lastname','birthday'])
+              for k in 'name','birthday','notes'])
     d['id'] = f.id.get_value() or None
     d['resparty'] = resparty
-    db.query('insert or replace into patient values ($id, $firstname, $middlename, $lastname, $resparty, $birthday)', d)
+    db.query('insert or replace into patient (id, name, resparty, birthday, notes) values ($id, $name, $resparty, $birthday, $notes)', d)
     row = db.query('select last_insert_rowid() as id')[0]
     if d['id'] is None and d['resparty'] is None:
         db.update('patient', where='id=%d' % row.id, resparty=row.id)
@@ -212,10 +216,13 @@ class new_handlers (web.storage):
     def appointment(journalid, form):
         # TODO should appointments in the past be legal? how to fail?
         #  ... transactions!
-        dt = input_datetime(form.dt.get_value())
-        duration = int(form.duration.get_value())
-        kind = form.kind.get_value()
-        db.insert('appointment', journalid=journalid, duration=duration, kind=kind)
+        dt = input_datetime(form.ts.get_value())
+        db.insert('appointment',
+                  journalid=journalid,
+                  duration=int(form.duration.get_value()),
+                  kind=form.kind.get_value(),
+                  status=form.status.get_value(),
+                  notes=form.notes.get_value())
         db.update('journal', where=('id=%d' % journalid), ts=store_datetime(dt))
 
 def new_journal(pt, kind, f):
@@ -225,6 +232,7 @@ def new_journal(pt, kind, f):
                           kind = kind,
                           summary = f.summary.get_value())
     getattr(new_handlers, kind)(journalid, f)
+    return journalid
 
 def get_journal(patientid, **kw):
     d = dict()
@@ -275,13 +283,30 @@ def new_tx(patientid, **kw):
     return db.insert('tx', patientid=patientid, **kw)
 
 def get_tx_for_appointment(appointmentid):
-    return db.where('tx', appointmentid=appointmentid)
+    Q = web.db.SQLQuery
+    P = web.db.SQLParam
+    return db.select('tx',
+                     where=Q(['appointmentid=',
+                              P(appointmentid),
+                              ' or appointmentid is null']),
+                     order='appointmentid DESC, id')
 
 
 # txplan
 # =================================================================
 # appointment
 
+
+def update_appt(journalid, form):
+    db.update('appointment',
+              where='journalid=%d' % journalid,
+              duration=int(form.duration.get_value()),
+              kind=form.kind.get_value(),
+              notes=form.notes.get_value())
+    db.update('journal',
+              where='id=%d' % journalid,
+              ts=store_datetime(input_datetime(form.ts.get_value())),
+              summary=form.summary.get_value())
 
 def appts_on_day(dt):
     start_day = dt.replace(hour=0, minute=0, second=0).astimezone(pytz.utc)

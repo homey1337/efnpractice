@@ -1,4 +1,4 @@
-$def with (form)
+$def with ()
 
 <html>
 <head>
@@ -7,8 +7,9 @@ $def with (form)
 </head>
 <body>
 
-<form class="nolabels" method="POST">
-$:form.render_css()
+<form class="nolabels" method="POST" action="/searchpt">
+  <input type="text" name="query"/>
+  <button type="submit" name="submit">search</button>
 </form>
 
 </body>

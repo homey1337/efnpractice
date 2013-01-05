@@ -92,7 +92,7 @@ def new_tx(patientid, summary):
                      tooth=tooth,
                      surf=surf,
                      fee=fee)
-                
+
 
 class show:
     def GET(self, id):
@@ -111,21 +111,3 @@ class show:
                 newtx.inputs[0].note = e.message
         txplan = model.get_txplan(pt.id)
         return render.txplan(pt, newtx, txplan)
-
-
-class edit_appt:
-    def GET(self, id):
-        journal = model.get_journal_entry(id)
-        appointment = model.get_appointment(journal.id)
-        pt = model.get_pt(journal.patientid)
-        txs = model.get_txplan(pt.id)
-        return render.edit_appt(journal, appointment, pt, txs)
-
-    def POST(self, id):
-        inp = web.input(txs=list())
-        id = int(id)
-        txs = list()
-        for tx in inp.txs:
-            txs.append(int(tx))
-        model.appt_tx_set(id, txs)
-        raise web.seeother('/appointment/%s' % id)

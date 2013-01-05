@@ -1,6 +1,7 @@
 import datetime
 
 import model
+import config
 
 from web.form import *
 
@@ -24,9 +25,10 @@ class dateformat (Validator):
             return False
 
 not_empty = regexp(r'.', 'cannot be empty')
-looks_like_date = dateformat('%Y-%m-%d', "doesn't look like a date (YYYY-MM-DD)")
-looks_like_dt = dateformat('%Y-%m-%d %H:%M',
-                           "doesn't look like a date and time (YYYY-MM-DD HH:MM)")
+looks_like_date = dateformat(config.date_fmt,
+                             "doesn't look like a date (%s)" % config.date_fmt)
+looks_like_dt = dateformat(config.datetime_fmt,
+                           "doesn't look like a date and time (%s)" % config.datetime_fmt)
 looks_like_number = regexp(r'[0-9]+',"doesn't look like a number")
 
 def _rp_is_unique_pt(i):
@@ -37,80 +39,80 @@ def _rp_is_unique_pt(i):
         return True
 names_unique_pt = Validator("doesn't name a unique patient", _rp_is_unique_pt)
 
-newappt = Form(
-    Textbox('pt', names_unique_pt, description='Patient'),
-    Textbox('summary', not_empty, description='Summary'),
-    Textbox('dt', looks_like_dt, description='When'),
-    Textbox('duration', looks_like_number, description='Length'),
-    Textbox('kind', not_empty, description='Kind'),
-    Textarea('notes', description='Note'),
-    Button('submit', type='submit', html='New')
-)
-
 patient = Form(
     Hidden('id'),
     Hidden('resparty'),
-    Textbox('firstname', not_empty, description='First name'),
-    Textbox('middlename', description='Middle name'),
-    Textbox('lastname', not_empty, description='Last name'),
-    Textbox('birthday', looks_like_date, description='Birthday'),
-    Textbox('resparty_text', names_unique_pt, description='Responsible Party'),
-    Button('submit', type='submit', html='Save'),
+    Textbox('name', not_empty, description='patient'),
+    Textbox('birthday', looks_like_date, description='birthdate'),
+    Textbox('resparty_text', names_unique_pt, description='responsible party'),
+    Textarea('notes', description='notes'),
+    Button('submit', type='submit', html='save'),
 )
 
 
 journal = dict(
     # these are just text fields
     address = Form(
-        Textarea('summary', not_empty, description='Address'),
-        Button('submit', type='submit', html='New')
+        Hidden('patientid'),
+        Textarea('summary', not_empty, description='address'),
+        Button('submit', type='submit', html='new')
         ),
     phone = Form(
-        Textbox('summary', not_empty, description='Phone'),
-        Button('submit', type='submit', html='New')
+        Hidden('patientid'),
+        Textbox('summary', not_empty, description='phone'),
+        Button('submit', type='submit', html='new')
         ),
     email = Form(
-        Textbox('summary', not_empty, description='Email'),
-        Button('submit', type='submit', html='New')
+        Hidden('patientid'),
+        Textbox('summary', not_empty, description='email'),
+        Button('submit', type='submit', html='new')
         ),
     contact = Form(
-        Textbox('summary', not_empty, description='Summary'),
-        Textarea('details', not_empty, description='Details'),
-        Button('submit', type='submit', html='New')
+        Hidden('patientid'),
+        Textbox('summary', not_empty, description='summary'),
+        Textarea('details', not_empty, description='details'),
+        Button('submit', type='submit', html='new')
         ),
     progress = Form(
-        Textbox('summary', not_empty, description='Summary'),
-        Textarea('sub', not_empty, description='S'),
-        Textarea('obj', not_empty, description='O'),
-        Textarea('ass', not_empty, description='A'),
-        Textarea('pln', not_empty, description='P'),
-        Button('submit', type='submit', html='New')
+        Hidden('patientid'),
+        Textbox('summary', not_empty, description='summary'),
+        Textarea('sub', not_empty, description='s'),
+        Textarea('obj', not_empty, description='o'),
+        Textarea('ass', not_empty, description='a'),
+        Textarea('pln', not_empty, description='p'),
+        Button('submit', type='submit', html='new')
         ),
     # nice to have some templates to select from
     # should allow free entry too
     Rx = Form(
-        Textbox('summary', not_empty, description='Drug'),
-        Textbox('disp', not_empty, description='Disp'),
-        Textbox('sig', not_empty, description='Sig'),
-        Textbox('refills', not_empty, description='Refills', value='0 (zero)'),
-        Button('submit', type='submit', html='New')
+        Hidden('patientid'),
+        Textbox('summary', not_empty, description='drug'),
+        Textbox('disp', not_empty, description='disp'),
+        Textbox('sig', not_empty, description='sig'),
+        Textbox('refills', not_empty, description='refills', value='0 (zero)'),
+        Button('submit', type='submit', html='new')
         ),
     # need to upload files
     doc = Form(
-        Textbox('summary', not_empty, description='Description'),
-        File('file', description='File'),
-        Button('submit', type='submit', html='New')
+        Hidden('patientid'),
+        Textbox('summary', not_empty, description='description'),
+        File('file', description='file'),
+        Button('submit', type='submit', html='new')
         ),
     appointment = Form(
-        Textbox('summary', not_empty, description='Summary'),
-        Textbox('dt', looks_like_dt, description='When'),
-        Textbox('duration', looks_like_number, description='Length'),
-        Textbox('kind', not_empty, description='Kind'),
-        Button('submit', type='submit', html='New')
-        ),
+        Hidden('journalid'),
+        Hidden('patientid'),
+        Textbox('ts', looks_like_dt, description='appointment'),
+        Textbox('duration', looks_like_number, description='length'),
+        Textbox('summary', not_empty, description='summary'),
+        Textbox('kind', not_empty, description='kind'),
+        Textbox('status', description='status'),
+        Textarea('notes', description='notes'),
+        # no submit button, it's in appointment.html manually
+    )
 )
 
 newtx = Form(
-    Textbox('tx', not_empty, description='Treatment'),
-    Button('submit', type='submit', html='Tx'),
+    Textbox('tx', not_empty, description='treatment'),
+    Button('submit', type='submit', html='tx'),
 )

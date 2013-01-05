@@ -1,0 +1,85 @@
+$def with (pt, ptform, resparty, journal)
+
+<html>
+<head>
+<title>$model.pt_name(pt) - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+<div id="topbar">
+  <form class="nolabels" method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit" name="submit">search</button>
+  </form>
+  <a href="/new/patient">new patient</a>
+  | <!-- or some other kind of separator -->
+  <a href="/today">today</a>
+  |
+  <a href="/signout">signoff</a>
+</div>
+
+<form method="POST">
+  <div id="patient">
+    $for input in ptform.inputs:
+      $if not input.is_hidden():
+        <div>
+          <span>$input.description</span>
+	  <span>$:input.render()</span>
+	  <span>$input.note</span>
+	  $if input.name == 'resparty_text' and pt:
+	    <span><a href="/family/$resparty.id">family</a></span>
+	  $if input.name == 'birthday' and pt and pt.birthday:
+            <span>
+              $ today = model.current_time().date()
+              $ age = (today - pt.birthday).days / 365.0
+              $('%.0f' % age) years old
+	    </span>
+	</div>
+      $else:
+        $:input.render()
+  </div>
+</form>
+
+$if pt:
+  <div id="journbar">
+    filter:
+    <a href="/pt/$pt.id?filter=contact">contacts</a>
+    <a href="/pt/$pt.id?filter=clinical">clinical</a>
+    <a href="/pt/$pt.id?filter=money">money</a>
+    new:
+    <a href="/new/appointment?pt=$pt.id">appointment</a>
+    <a href="/new/address?pt=$pt.id">address</a>
+    <a href="/new/phone?pt=$pt.id">phone</a>
+    <a href="/new/email?pt=$pt.id">email</a>
+    <a href="/new/contact?pt=$pt.id">contact</a>
+    <a href="/new/doc?pt=$pt.id">doc</a>
+    <a href="/new/Rx?pt=$pt.id">Rx</a>
+    <a href="/new/progress?pt=$pt.id">progress</a>
+    <a href="/txplan/$pt.id">tx</a>
+  </div>
+
+  $ future = True
+  $ tomorrow = model.store_datetime((datetime.datetime.now(tz=config.tz).replace(hour=0,minute=0,second=0,microsecond=0)+datetime.timedelta(seconds=86400)).astimezone(pytz.utc))
+  $ balance = 0.0
+  <div id="journal">
+  $for entry in journal:
+    $if future and entry.ts < tomorrow:
+      <hr/>
+      $ future = False
+    <div class="$entry.kind">
+      <span>$model.display_datetime(model.load_datetime(entry.ts))</span>
+      <span><a href="/journal/$entry.id">$entry.kind</a></span>
+      <span>$entry.summary</span>
+      $if entry.money:
+        <span class="money">$('$ %.2f' % entry.money)</span>
+        $ balance += entry.money
+        <span class="money">$('$ %.2f' % balance)</span>
+      $else:
+        <span> </span>
+        <span> </span>
+    </div>
+  </div>
+
+</body>
+</html>
