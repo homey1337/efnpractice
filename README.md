@@ -10,3 +10,8 @@ depends:
 * [pytz](http://pypi.python.org/pypi/pytz)
 
 easy on archlinux: `pacman -S python2 python2-webpy python2-magic python2-pytz`
+
+license
+=======
+
+this is licensed under a Simplified BSD License; see the file LICENSE for details.
