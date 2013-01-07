@@ -7,10 +7,17 @@ $def with ()
 </head>
 <body>
 
-<form class="nolabels" method="POST" action="/searchpt">
-  <input type="text" name="query"/>
-  <button type="submit" name="submit">search</button>
-</form>
+<div id="topbar">
+  <form class="nolabels" method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit" name="submit">search</button>
+  </form>
+  <a href="/new/patient">new patient</a>
+  |
+  <a href="/today">today</a>
+  |
+  <a href="/signout">signoff</a>
+</div>
 
 </body>
 </html>
