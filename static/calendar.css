@@ -1,31 +1,52 @@
-#topbar {
-    position: fixed;
+#calendar {
+    position: relative;
+}
+
+#times {
+    text-align: right;
+    position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    /* arrrgh height doesn't quite scale nicely with font changes because of the button */
+    width: 5ex;
 }
 
 .time {
-    text-align: right;
-    width: 5ex;
     position: absolute;
-    left: 0px;
+    left: 0;
+    right: 0;
 }
 
-.newappt {
+#calbody {
     position: absolute;
+    top: 0;
     left: 6ex;
-    right: 3ex;
+    right: 6ex;
+}
+
+.oneday {
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.dayheader {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -2em;
+    text-align: center;
 }
 
 .appt {
     position: absolute;
-    left: 6ex;
+    left: 0;
+    right: 0;
 
     background-color: orange;
     border: 1px solid black;
     overflow: hidden;
+
+    border-radius: 1ex;
 }
 
 .avail {

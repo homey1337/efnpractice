@@ -22,8 +22,9 @@ import model
 
 urls = (
     '/', 'index',
-    # the search patient form action
+    # some form targets
     '/searchpt', 'searchpt',
+    '/gotoday', 'gotoday',
     # patients and families
     '/family/(.*)', 'family',
     '/patient/(.*)', 'edit_patient',
@@ -53,16 +54,21 @@ class index:
 
 class searchpt:
     def POST(self):
-        f = forms.search()
-        f.validates()
-        q = ' '.join(f.query.get_value().split())
+        f = web.input()
+        q = ' '.join(f.query.split())
         pts = model.pt_name_search(q)
         if len(pts) == 0:
-            return render.family(list())
+            return 'no patient found'
         elif len(pts) == 1:
             raise web.seeother('/patient/%d' % pts[0].id)
         else:
             return render.family(pts)
+
+class gotoday:
+    def POST(self):
+        f = web.input()
+        d = model.input_date(f.date)
+        raise web.seeother('/oneday/%s' % model.display_date(d))
 
 
 # a list of multiple patients ... generally relatives

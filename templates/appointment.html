@@ -31,7 +31,7 @@ $def with (journal, appt, pt, form, txs)
 	    </span>
 	</div>
     <div>
-      <span>Treatments</span>
+      <span>treatments</span>
       <span>
 	$ total = 0.0
 	<div id="txplan">
@@ -39,12 +39,12 @@ $def with (journal, appt, pt, form, txs)
             <div class="tx">
 	      <span>
               $if appt and tx.appointmentid == appt.journalid:
+	        $ total += tx.fee
 		<input type="checkbox" name="txs" value="$tx.id" checked="checked"/>
 	      $else:
 		<input type="checkbox" name="txs" value="$tx.id"/>
 	      </span>
 	      <span>$tx.summary</span>
-	      $ total += tx.fee
 	      <span class="money">$('$ %.2f' % tx.fee)</span>
 	      <span>$model.tx_status(tx)</span>
 	    </div>

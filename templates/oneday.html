@@ -14,51 +14,83 @@ $# TODO generalize to multiple days
 </head>
 <body>
 
-$code
-  firsthour = 0
-  lasthour = 23
-
-  def hourtop(h):
-    return '%.1fex' % (6 + 6*h)
-
-  def hourheight(duration):
-    return '%.1fex' % (duration / 10.0)
-
-$for hour in range(firsthour, lasthour+1):
-  <div class="time" style="top: $(hourtop(hour));">$hour:00</div>
-
-<div class="appt avail" style="top: $(hourtop(8)); height: $(hourheight(4*60)); right: 6ex;">
-</div>
-<div class="appt avail" style="top: $(hourtop(13)); height: $(hourheight(4*60)); right: 6ex;">
-</div>
-
-$for i in range(len(appts)):
-  $code
-    a = appts[i]
-    p = pts[i]
-    dt = model.load_datetime(a.ts).astimezone(config.tz)
-    hour = dt.hour + float(dt.minute)/60
-    duration = a.duration
-
-  <div class="appt $a.kind" style="top: $(hourtop(hour)); height: $(hourheight(duration)); right: 6ex;">
-    <span style="font-size: 90%;">$dt.strftime('%H:%M')</span>
-    <span style="font-size: 110%;">
-      <a href="/patient/$p.id">$model.pt_name(p)</a>
-    </span>
-    <span>
-      <a href="/journal/$a.journalid">$a.summary</a>
-    </span>
-    <span>
-      $a.notes
-    </span>
-  </div>
-
 <div id="topbar">
   <form method="POST" action="/searchpt">
     <input type="text" name="query"/>
     <button type="submit">search</button>
   </form>
+  <form method="POST" action="/gotoday">
+    <input type="text" name="date"/>
+    <button type="submit">day</button>
+  </form>
+  $ showing_today = model.display_date(model.current_time().astimezone(config.tz)) == model.display_date(today)
+  $ oneday = datetime.timedelta(days=1)
+  <a href="/oneday/$model.display_date(today - oneday)">$model.display_date(today - oneday)</a>
+  $if not showing_today:
+    <a href="/oneday/$model.display_date(model.current_time().astimezone(config.tz))">
+  today
+  $if not showing_today:
+    </a>
+  <a href="/oneday/$model.display_date(today + oneday)">$model.display_date(today + oneday)</a>
 </div>
 
+<div>
+  <!-- placeholder -->
+  &nbsp; <br/> &nbsp;
+</div>
+
+$code
+  firsthour = 7
+  lasthour = 21
+
+  def hourtop(h):
+    return '%.1fex' % (6*(h - firsthour))
+
+  def hourheight(duration):
+    return '%.1fex' % (duration / 10.0)
+
+<div id="calendar">
+
+<div id="times">
+$for hour in range(firsthour, lasthour+1):
+  <div class="time" style="top: $(hourtop(hour));">$hour:00</div>
+</div>
+
+<div id="calbody">
+  <div class="oneday">
+    <div class="dayheader">
+      $:today.strftime('%A<br/>%B %d')
+    </div>
+
+    $# TODO this should come from database, obey holidays, etc
+    <div class="appt avail" style="top: $(hourtop(8)); height: $(hourheight(4*60));">
+    </div>
+    <div class="appt avail" style="top: $(hourtop(13)); height: $(hourheight(4*60));">
+    </div>
+
+    $for i in range(len(appts)):
+      $code
+        a = appts[i]
+        p = pts[a.patientid]
+        dt = model.load_datetime(a.ts).astimezone(config.tz)
+        top = hourtop(dt.hour + float(dt.minute)/60)
+        height = hourheight(a.duration)
+
+      <div class="appt $a.kind" style="top: $top; height: $height;">
+	<span>$dt.strftime('%H:%M')</span>
+	<span>
+	  <a href="/patient/$p.id">$model.pt_name(p)</a>
+	</span>
+	<span>
+	  <a href="/journal/$a.journalid">$a.summary</a>
+	</span>
+	<span>
+	  $a.notes
+	</span>
+      </div>
+  </div>
+</div>
+
+</div>
 </body>
 </html>

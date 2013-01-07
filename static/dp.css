@@ -3,6 +3,7 @@
 body {
     padding: 0ex;
     margin: 0ex;
+    font-family: sans-serif;
     font-size: 10pt;
 }
 
@@ -14,11 +15,14 @@ input {
 
 input[type=text] {
     font-family: sans-serif;
+    font-size: 10pt;
     width: 15em;
 }
 
 textarea {
+    position: relative;
     font-family: sans-serif;
+    font-size: 10pt;
     border: 1px solid #eee;
     width: 15em;
     height: 4em;
@@ -29,6 +33,9 @@ textarea {
 button {
     font-family: sans-serif;
     font-size: 10pt;
+    -webkit-appearance: none;
+    border-radius: .3ex;
+    border: 1px solid #777;
 }
 
 /* tweaks to links */
@@ -224,20 +231,12 @@ span.money {
 /* Other rx boxes only display when printed
    (handled by rx-print.css stylesheet) */
 
-#Rxdoctor {
-    display: none;
-}
-
 #Rxdoctor div {
     display: table-row;
 }
 
 #Rxdoctor span {
     display: table-cell;
-}
-
-#Rxpatient {
-    display: none;
 }
 
 #Rxpatient div {
@@ -248,7 +247,7 @@ span.money {
     display: table-cell;
 }
 
-#Rxsignature {
+#Rxsignature, #Rxdoctor, #Rxpatient {
     display: none;
 }
 
