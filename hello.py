@@ -38,7 +38,8 @@ urls = (
     '/txplan/(.*)', 'txplan.show',
     # schedule
     '/oneday/(.*)', 'schedule.oneday',
-    '/today', 'schedule.today',
+    '/today', 'schedule.oneday',
+    '/days', 'schedule.days',
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!

@@ -1,9 +1,9 @@
-$def with (today,appts,pts)
+$def with (days, pts)
 
 <html>
 <head>
 
-<title>One Day</title>
+<title>Several Days</title>
 <link rel="stylesheet" href="/static/dp.css"/>
 <link rel="stylesheet" href="/static/calendar.css"/>
 
@@ -19,15 +19,17 @@ $def with (today,appts,pts)
     <input type="text" name="date"/>
     <button type="submit">day</button>
   </form>
+  $ today = days[0][0]
   $ showing_today = model.display_date(model.current_time().astimezone(config.tz)) == model.display_date(today)
+  $ ndays = datetime.timedelta(days=len(days))
   $ oneday = datetime.timedelta(days=1)
-  <a href="/oneday/$model.display_date(today - oneday)">$model.display_date(today - oneday)</a>
+  <a href="/days?first=$model.display_date(today - ndays)&last=$model.display_date(today - oneday)">$model.display_date(today - ndays)</a>
   $if not showing_today:
-    <a href="/oneday/$model.display_date(model.current_time().astimezone(config.tz))">
+    <a href="/days?first=$model.display_date(model.local_time())&last=$model.display_date(model.local_time() + ndays - oneday)">
   today
   $if not showing_today:
     </a>
-  <a href="/oneday/$model.display_date(today + oneday)">$model.display_date(today + oneday)</a>
+  <a href="/days?first=$model.display_date(today + ndays)&last=$model.display_date(today + ndays + ndays - oneday)">$model.display_date(today + ndays)</a>
 </div>
 
 <div>
@@ -52,8 +54,12 @@ $for hour in range(firsthour, lasthour+1):
   <div class="time" style="top: $(hourtop(hour));">$hour:00</div>
 </div>
 
+$ daywidth = 100.0 / len(days)
+
 <div id="calbody">
-  <div class="oneday">
+$for d in range(len(days)):
+  $ today, appts = days[d]
+  <div class="oneday" style="width: $('%.1f'%daywidth)%; left: $('%.1f'%(d*daywidth))%;">
     <div class="dayheader">
       $:today.strftime('%A<br/>%B %d')
     </div>
