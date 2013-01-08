@@ -4,7 +4,7 @@ import model
 
 import web
 
-def new_tx(patientid, summary):
+def new_tx(patientid, summary, appointmentid=None):
     tokens = [x.lower() for x in summary.split()]
     txs = list()
     if tokens[0].startswith('#'):
@@ -35,7 +35,7 @@ def new_tx(patientid, summary):
                             code, tooth, None, fee))
             elif thing.startswith('e'):
                 txs.append(('#%s %s' % (tooth, 'ext'),
-                            7210, tooth, None, fee))
+                            7210, tooth, None, 210.00))
             else:
                 for c in thing:
                     if c not in 'moidbfl':
@@ -91,7 +91,8 @@ def new_tx(patientid, summary):
                      code=code,
                      tooth=tooth,
                      surf=surf,
-                     fee=fee)
+                     fee=fee,
+                     appointmentid=appointmentid)
 
 
 class show:

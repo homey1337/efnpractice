@@ -11,6 +11,7 @@ db = web.database(dbn='sqlite', db='dp.sqlite')
 # =================================================================
 # datetime
 
+# TODO daylight savings time isn't being handled the way I want
 
 def current_time():
     return datetime.datetime.now(pytz.utc)

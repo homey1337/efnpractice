@@ -57,13 +57,16 @@ class searchpt:
     def POST(self):
         f = web.input()
         q = ' '.join(f.query.split())
-        pts = model.pt_name_search(q)
-        if len(pts) == 0:
-            return 'no patient found'
-        elif len(pts) == 1:
-            raise web.seeother('/patient/%d' % pts[0].id)
+        if q:
+            pts = model.pt_name_search(q)
+            if len(pts) == 0:
+                return 'no patient found'
+            elif len(pts) == 1:
+                raise web.seeother('/patient/%d' % pts[0].id)
+            else:
+                return render.family(pts)
         else:
-            return render.family(pts)
+            return render.family(model.db.select('patient'))
 
 class gotoday:
     def POST(self):
