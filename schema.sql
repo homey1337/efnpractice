@@ -13,6 +13,9 @@ create table if not exists journal
   summary text,
   money currency);
 
+create index if not exists journal_ts
+ on journal(ts desc);
+
 create table if not exists contact
  (journalid integer primary key,
   details text);

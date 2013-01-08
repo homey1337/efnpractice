@@ -263,7 +263,7 @@ def appts_on_day(dt):
                               'and ts>',P(store_datetime(start_day)),
                               'and ts<',P(store_datetime(end_day)),
                               'and journal.id=appointment.journalid']),
-                     order='ts ASC').list()
+                     order='ts DESC').list()
 
 def new_appt(patientid, dt, **kw):
     at = dt.replace(second=0, microsecond=0, minute=(dt.minute - dt.minute%10)).astimezone(pytz.utc)
