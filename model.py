@@ -11,6 +11,7 @@ db = web.database(dbn='sqlite', db='dp.sqlite')
 # =================================================================
 # datetime
 
+
 # TODO daylight savings time isn't being handled the way I want
 
 def current_time():
@@ -20,13 +21,13 @@ def local_time():
     return datetime.datetime.now(config.tz)
 
 def input_date(s):
-    return datetime.datetime.strptime(s, config.date_fmt).replace(tzinfo=config.tz).astimezone(pytz.utc)
+    return config.tz.localize(datetime.datetime.strptime(s, config.date_fmt)).astimezone(pytz.utc)
 
 def display_date(dt):
     return dt.astimezone(config.tz).strftime(config.date_fmt)
 
 def input_datetime(s):
-    return datetime.datetime.strptime(s, config.datetime_fmt).replace(tzinfo=config.tz).astimezone(pytz.utc)
+    return config.tz.localize(datetime.datetime.strptime(s, config.datetime_fmt)).astimezone(pytz.utc)
 
 def display_datetime(dt):
     return dt.astimezone(config.tz).strftime(config.datetime_fmt)
@@ -35,7 +36,7 @@ def store_datetime(dt):
     return dt.strftime(config.db_fmt)
 
 def load_datetime(s):
-    return datetime.datetime.strptime(s, config.db_fmt).replace(tzinfo=pytz.utc)
+    return pytz.utc.localize(datetime.datetime.strptime(s, config.db_fmt))
 
 
 # datetime
