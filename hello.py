@@ -110,8 +110,8 @@ class edit_patient:
         if not f.validates():
             return render.edit_patient(f)
         else:
-            #TODO: this query is done twice now (here and during validation)
             if f.resparty_text.get_value():
+                #TODO: this query is done twice now (here and during validation)
                 # validation already established that this mapping is unique
                 # so we do not need to check it here
                 rp = model.pt_name_search(f.resparty_text.get_value())

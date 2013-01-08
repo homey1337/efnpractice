@@ -9,69 +9,7 @@ db = web.database(dbn='sqlite', db='dp.sqlite')
 
 
 # =================================================================
-# schema
-
-
-schema = [
-    # making extensive use of automatic string concatenation by the parser
-
-    'create table if not exists patient'
-    ' (id integer primary key,'
-    '  name string,'
-    '  resparty integer references patient(id),'
-    '  birthday date,'
-    '  notes text)',
-
-    'create table if not exists journal'
-    ' (id integer primary key,'
-    '  patientid integer references patient(id),'
-    '  ts datetime,'
-    '  kind string,'
-    '  summary text,'
-    '  money currency)',
-
-    'create table if not exists contact'
-    ' (journalid integer primary key,'
-    '  details text)',
-
-    'create table if not exists appointment'
-    ' (journalid integer primary key,'
-    '  duration integer,'
-    '  status string,'
-    '  kind string,'
-    '  notes text)',
-
-    'create table if not exists progress'
-    ' (journalid integer primary key,'
-    '  sub text,'
-    '  obj text,'
-    '  ass text,'
-    '  pln text)',
-
-    'create table if not exists rx'
-    ' (journalid integer primary key,'
-    '  disp string,'
-    '  sig string,'
-    '  refills string)',
-
-    'create table if not exists tx'
-    ' (id integer primary key,'
-    '  journalid integer references journal(id),'
-    '  patientid integer references patient(id),'
-    '  appointmentid integer references appointment(id),'
-    '  claimid integer references claim(id),'
-    '  summary string,'
-    '  code integer,'
-    '  tooth string,'
-    '  surf string,'
-    '  fee currency,'
-    '  inspaid currency,'
-    '  ptpaid currency)',
-]
-
-def create_schema():
-    for q in schema:
-        db.query(q)
+# datetime
 
 
 def current_time():
@@ -99,7 +37,7 @@ def load_datetime(s):
     return datetime.datetime.strptime(s, config.db_fmt).replace(tzinfo=pytz.utc)
 
 
-# schema
+# datetime
 # =================================================================
 # pt
 
