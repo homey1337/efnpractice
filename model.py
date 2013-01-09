@@ -200,6 +200,20 @@ def get_Rx(journalid):
 def get_appointment(journalid):
     return db.where('appointment', journalid=journalid)[0]
 
+def get_posted_tx(journalid):
+    return db.where('tx', journalid=journalid).list()
+
+def post_appointment(appt, journal, txids):
+    fee = db.query('select sum(fee) as fee from tx where appointmentid=%d' % appt.journalid)[0].fee
+    journalid = db.insert('journal',
+                          patientid=journal.patientid,
+                          ts=store_datetime(current_time()),
+                          kind='tx',
+                          summary=journal.summary,
+                          money=fee)
+    db.update('tx', where='id in (%s)' % (','.join(map(str, txids))), journalid=journalid)
+    db.update('appointment', where='journalid=%d' % journal.id, status='posted')
+
 
 # journal
 # =================================================================

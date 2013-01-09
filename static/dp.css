@@ -283,3 +283,33 @@ span.money {
     border-top: 1px solid black;
     font-weight: bold;
 }
+
+/* tx journal entry styling */
+
+#txjournal {
+    display: table;
+}
+
+#txjournal div {
+    display: table-row;
+}
+
+#txjournal span {
+    display: table-cell;
+}
+
+.headers {
+    font-weight: bold;
+}
+
+#treatments {
+    display: table;
+}
+
+#treatments div {
+    display: table-row;
+}
+
+#treatments span {
+    display: table-cell;
+}

@@ -189,6 +189,20 @@ class view_handlers (web.storage):
         return render.Rx(journal, Rx, pt, address)
 
     @staticmethod
+    def tx(journal):
+        txs = model.get_posted_tx(journal.id)
+        pt = model.get_pt(journal.patientid) # or tx.patientid
+        appointments = dict()
+        claims = dict()
+        for tx in txs:
+            if tx.appointmentid and tx.appointmentid not in appointments:
+                appointments[tx.appointmentid] = model.get_appointment(tx.appointmentid)
+            if tx.claimid and tx.claimid not in claims:
+                # TODO this won't work because claims aren't in model yet
+                claims[tx.claimid] = model.get_claim(tx.claimid)
+        return render.tx(journal, pt, txs, appointments, claims)
+
+    @staticmethod
     def appointment(journal, form=None):
         if journal:
             appt = model.get_appointment(journal.id)
@@ -243,6 +257,11 @@ class show_journal:
             inp = web.input(txs=list()) # to pickup the custom txs field
             form = forms.journal['appointment']()
             if form.validates():
+                if journal:
+                    appt = model.get_appointment(journal.id)
+                    if appt.status == 'posted':
+                        form.status.note = 'cannot modify posted appointments'
+                        return view_handlers.appointment(journal, form)
                 if id:
                     model.update_appt(journal.id, form)
                 else:
@@ -250,74 +269,17 @@ class show_journal:
                     journalid = model.new_journal(pt, 'appointment', form)
                     journal = model.get_journal_entry(journalid)
                 txs = list()
-                for tx in inp.txs:
-                    txs.append(int(tx))
+                for txid in inp.txs:
+                    txs.append(int(txid))
                 model.appt_tx_set(journal.id, txs)
+                if inp.submit == 'post':
+                    model.post_appointment(appt, journal, map(int, txs))
                 return view_handlers.appointment(model.get_journal_entry(journal.id))
             else:
                 return view_handlers.appointment(journal, form)
         else:
             return getattr(view_handlers, journal.kind)(journal)
 
-
-class new_appointment:
-    def GET(self, id=None):
-        f = forms.newappt()
-        if id is None:
-            dt = model.current_time()
-            dt = dt.replace(minute=(dt.minute - dt.minute % 10),
-                            second=0, microsecond=0)
-            inp = web.input(dt=model.display_datetime(dt),
-                            pt='')
-            dt = model.input_datetime(inp.dt)
-            f.dt.set_value(model.display_datetime(model))
-            f.pt.set_value(inp.pt)
-        else:
-            appt = model.get_appointment(id)
-            journal = model.get_journal_entry(id)
-            pt = model.get_pt(journal.patientid)
-
-            f.pt.set_value(model.pt_name(pt, first='lastname'))
-            f.summary.set_value(journal.summary)
-            dt = model.load_datetime(journal.ts)
-            f.dt.set_value(model.display_datetime(dt))
-            f.duration.set_value('%s'%appt.duration)
-            f.kind.set_value(appt.kind)
-            f.notes.set_value(appt.note)
-            f.submit.attrs['html'] = 'Save'
-        return render.newappt(f)
-
-    def POST(self, id=None):
-        f = forms.newappt()
-        if f.validates():
-            pt = model.pt_name_search(f.pt.get_value())[0]
-            summary = f.summary.get_value()
-            dt = model.input_datetime(f.dt.get_value())
-            duration = int(f.duration.get_value())
-            kind = f.kind.get_value()
-            note = f.notes.get_value()
-            if id is None:
-                appointmentid = model.new_appt(pt.id, dt,
-                                               summary=summary,
-                                               duration=duration,
-                                               kind=kind,
-                                               note=note)
-            else:
-                appointmentid = int(id)
-                model.db.update('appointment',
-                                where='journalid=%d' % appointmentid,
-                                duration=duration,
-                                kind=kind,
-                                note=note)
-                model.db.update('journal',
-                                where='id=%d' % appointmentid,
-                                ts=model.store_datetime(dt),
-                                patientid=pt.id,
-                                summary=summary)
-            raise web.seeother('/appointment/%d' % appointmentid)
-        else:
-            return render.newappt(f)
-        
 
 if __name__ == "__main__":
     app.run()
