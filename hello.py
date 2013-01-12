@@ -40,6 +40,8 @@ urls = (
     '/oneday/(.*)', 'schedule.oneday',
     '/today', 'schedule.oneday',
     '/days', 'schedule.days',
+    # carriers
+    '/setup/carriers', 'carriers.edit',
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!

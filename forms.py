@@ -30,6 +30,7 @@ looks_like_date = dateformat(config.date_fmt,
 looks_like_dt = dateformat(config.datetime_fmt,
                            "doesn't look like a date and time (%s)" % config.datetime_fmt)
 looks_like_number = regexp(r'[0-9]+',"doesn't look like a number")
+looks_like_phone = regexp(r'[0-9]{3}-[0-9]{3}-[0-9]{4}', "doesn't look like a phone number")
 
 def _rp_is_unique_pt(i):
     if i:
@@ -115,4 +116,13 @@ journal = dict(
 newtx = Form(
     Textbox('tx', not_empty, description='treatment'),
     Button('submit', type='submit', html='tx'),
+)
+
+carrier = Form(
+    Textbox('name', not_empty, description='name'),
+    Textarea('address', not_empty, description='address'),
+    Textbox('phone', looks_like_phone, description='phone'),
+    Textbox('web', description='web address'),
+    Textbox('eclaim', description='electronic payer id'),
+    Button('submit', type='submit', html='new'),
 )

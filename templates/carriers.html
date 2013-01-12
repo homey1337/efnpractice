@@ -1,0 +1,41 @@
+$def with (carriers, form)
+
+<html>
+<head>
+<title>Setup Carriers</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+<div id="topbar">
+  <form class="nolabels" method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit" name="submit">search</button>
+  </form>
+</div>
+
+<div id="carriers">
+$for carrier in carriers:
+  <div class="carrier">
+    <span>$carrier.name</span>
+    <span>$:carrier.address.replace('\n','<br/>')</span>
+    <span>$carrier.phone</span>
+    <span><a href="$carrier.web">$carrier.web</a></span>
+    <span>$carrier.eclaim</span>
+  </div>
+</div>
+
+<hr/>
+
+<form method="POST">
+<table>
+$for input in form.inputs:
+  <tr>
+    <td>$input.description</td>
+    <td>$:input.render()</td>
+  </tr>
+</table>
+</form>
+
+</body>
+</html>

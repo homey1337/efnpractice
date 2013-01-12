@@ -313,3 +313,17 @@ span.money {
 #treatments span {
     display: table-cell;
 }
+
+/* carriers listing */
+
+#carriers {
+    display: table;
+}
+
+#carriers div {
+    display: table-row;
+}
+
+#carriers span {
+    display: table-cell;
+}

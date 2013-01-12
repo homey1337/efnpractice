@@ -296,3 +296,18 @@ def appt_tx_set(appointmentid, txs):
 
 # appointment
 # =================================================================
+# carriers
+
+def get_carriers():
+    return db.select('carrier', order='name ASC')
+
+def new_carrier(form):
+    return db.insert('carrier',
+                     name=form.name.get_value(),
+                     address=form.address.get_value(),
+                     phone=form.phone.get_value(),
+                     web=form.web.get_value(),
+                     eclaim=form.eclaim.get_value())
+
+# carriers
+# =================================================================
