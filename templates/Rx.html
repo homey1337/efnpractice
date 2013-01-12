@@ -13,27 +13,27 @@ $def with (journal, Rx, pt, address)
 <div id="Rxdoctor">
   <div class="name">
     <span class="label">doctor</span>
-    <span>Daniel Smith McNair</span>
+    <span>$config.provider.name</span>
   </div>
   <div class="practice">
     <span class="label">practice</span>
-    <span>McNair Family Dentistry</span>
+    <span>$config.office.name</span>
   </div>
   <div class="address">
     <span class="label">address</span>
-    <span>125 E 3rd St<br/>Ste A<br/>Edmond OK 73034</span>
+    <span>$:config.provider.address.replace('\n','<br/>')</span>
   </div>
   <div class="phone">
     <span class="label">phone</span>
-    <span>405-703-5344</span>
+    <span>$config.provider.phone</span>
   </div>
   <div class="NPI">
     <span class="label">npi</span>
-    <span>1508029331</span>
+    <span>$config.provider.npi</span>
   </div>
   <div class="DEA">
     <span class="label">dea</span>
-    <span>FM0951310</span>
+    <span>$config.provider.dea</span>
   </div>
 </div>
 
@@ -48,7 +48,10 @@ $def with (journal, Rx, pt, address)
   </div>
   <div class="address">
     <span class="label">address</span>
-    <span>$address.summary</span>
+    $if address:
+      <span>$:address.summary.replace('\n','<br/>')</span>
+    $else:
+      <span><em>no address given!</em></span>
   </div>
 </div>
 
