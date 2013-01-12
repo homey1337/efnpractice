@@ -7,7 +7,13 @@ $def with (journal, contact, pt)
 </head>
 <body>
 
-<h1>Contact with $model.pt_name(pt)</h1>
+<div id="topbar">
+  <a href="/patient/$pt.id">$pt.name</a>
+  <form method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit" name="submit">search</button>
+  </form>
+</div>
 
 <div id="contact">
   <div class="when">

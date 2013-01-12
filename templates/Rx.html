@@ -8,7 +8,13 @@ $def with (journal, Rx, pt, address)
 </head>
 <body>
 
-<h1>Rx for $model.pt_name(pt)</h1>
+<div id="topbar">
+  <a href="/patient/$pt.id">$pt.name</a>
+  <form method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit" name="submit">search</button>
+  </form>
+</div>
 
 <div id="Rxdoctor">
   <div class="name">
