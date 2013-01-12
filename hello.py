@@ -273,6 +273,9 @@ class show_journal:
                     txs.append(int(txid))
                 model.appt_tx_set(journal.id, txs)
                 if inp.submit == 'post':
+                    if model.load_datetime(journal.ts) > model.current_time():
+                        form.ts.note = 'cannot post appointments in the future'
+                        return view_handlers.appointment(journal, form)
                     model.post_appointment(appt, journal, map(int, txs))
                 return view_handlers.appointment(model.get_journal_entry(journal.id))
             else:
