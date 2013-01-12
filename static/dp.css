@@ -327,3 +327,17 @@ span.money {
 #carriers span {
     display: table-cell;
 }
+
+/* plan display! */
+
+#plan {
+    display: table;
+}
+
+#plan div {
+    display: table-row;
+}
+
+#plan span {
+    display: table-cell;
+}

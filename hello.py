@@ -131,11 +131,13 @@ class edit_patient:
 
 class edit_journal:
     def GET(self, kind):
-        inp = web.input(pt=0)
+        inp = web.input(pt=0, secondaryto=None)
         patientid = int(inp.pt)
         form = forms.journal[kind]
         pt = model.get_pt(patientid)
         form.patientid.set_value(pt.id)
+        if inp.secondaryto:
+            form.secondaryto.set_value(inp.secondaryto)
         return render.journal(pt, kind, form)
 
     def POST(self, kind):
@@ -145,6 +147,8 @@ class edit_journal:
             model.new_journal(pt, kind, f)
             raise web.seeother('/patient/%d' % pt.id)
         else:
+            inp = web.input(pt=0)
+            pt = model.get_pt(inp.pt)
             return render.journal(pt, kind, f)
 
 
@@ -182,6 +186,18 @@ class view_handlers (web.storage):
         progress = model.get_progress(journal.id)
         pt = model.get_pt(journal.patientid)
         return render.progress(journal, progress, pt)
+
+    @staticmethod
+    def plan(journal):
+        plan = model.get_plan(journal.id)
+        pt = model.get_pt(journal.patientid)
+        carrier = model.get_carrier(plan.carrierid)
+        insured = model.get_pt(plan.insuredid)
+        if plan.secondaryto:
+            primary = model.get_plan(plan.secondaryto)
+        else:
+            primary = None
+        return render.plan(journal, plan, pt, carrier, insured, primary)
 
     @staticmethod
     def Rx(journal):

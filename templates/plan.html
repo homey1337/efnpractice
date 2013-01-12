@@ -1,0 +1,91 @@
+$def with (journal, plan, pt, carrier, insured, primary)
+
+<html>
+<head>
+<title>Plan for $model.pt_name(pt) - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+<div id="topbar">
+  <a href="/patient/$pt.id">$pt.name</a>
+  <form method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit" name="submit">search</button>
+  </form>
+</div>
+
+<div id="plan">
+  <div class="when">
+    <span>plan</span>
+    <span>$model.display_datetime(model.load_datetime(journal.ts))</span>
+  </div>
+  $if plan.secondaryto:
+    <div>
+      <span>secondary to</span>
+      <span><a href="/journal/$plan.secondaryto">$primary.summary</a></span>
+    </div>
+  <div>
+    <span>carrier</span>
+    <span>$carrier.name</span>
+    <span>$carrier.address</span>
+    <span>$carrier.phone</span>
+  </div>
+  <div>
+    <span>insured</span>
+    <span><a href="/patient/$insured.id">$insured.name</a></span>
+  </div>
+  <div>
+    <span>relationship</span>
+    <span>$plan.relationship</span>
+  </div>
+  <div>
+    <span>student status</span>
+    <span>$plan.student_status</span>
+  </div>
+  <div>
+    <span>group #</span>
+    <span>$plan.groupnum</span>
+  </div>
+  <div>
+    <span>id #</span>
+    <span>$plan.idnum</span>
+  </div>
+  <div>
+    <span>employer</span>
+    <span>$plan.employer</span>
+  </div>
+  <div>
+    <span>deductible</span>
+    <span class="money">$('$ %.2f' % plan.deductible)</span>
+  </div>
+  <div>
+    <span>annual maximum</span>
+    <span class="money">$('$ %.2f' % plan.maximum)</span>
+  </div>
+  <div>
+    <span>preventative</span>
+    <span class="money">$plan.prevent %</span>
+  </div>
+  <div>
+    <span>basic</span>
+    <span class="money">$plan.basic %</span>
+  </div>
+  <div>
+    <span>major</span>
+    <span class="money">$plan.major %</span>
+  </div>
+  <div>
+    <span>notes</span>
+    <span>$:plan.notes.replace('\n','<br/>')</span>
+  </div>
+  <div>
+    <span></span>
+    <span>
+      <a href="/new/plan?pt=$pt.id&secondaryto=$plan.journalid">new secondary</a>
+    </span>
+  </div>
+</div>
+
+</body>
+</html>

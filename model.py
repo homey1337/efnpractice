@@ -135,6 +135,33 @@ class new_handlers (web.storage):
                   pln=form.pln.get_value())
 
     @staticmethod
+    def plan(journalid, form):
+        secondaryto = form.secondaryto.get_value()
+        if secondaryto:
+            secondaryto = int(secondaryto)
+        else:
+            secondaryto = None
+
+        # we already know this names a unique patient after form validation
+        insured = pt_name_search(form.insured.get_value())[0]
+
+        db.insert('plan',
+                  journalid=journalid,
+                  secondaryto=secondaryto,
+                  carrierid=int(form.carrier.get_value()),
+                  insuredid=insured.id,
+                  relationship=form.relationship.get_value(),
+                  groupnum=form.groupnum.get_value(),
+                  idnum=form.idnum.get_value(),
+                  employer=form.employer.get_value(),
+                  deductible=float(form.deductible.get_value()),
+                  maximum=float(form.maximum.get_value()),
+                  prevent=int(form.prevent.get_value()),
+                  basic=int(form.basic.get_value()),
+                  major=int(form.major.get_value()),
+                  notes=form.notes.get_value())
+
+    @staticmethod
     def Rx(journalid, form):
         db.insert('rx',
                   journalid=journalid,
@@ -301,6 +328,9 @@ def appt_tx_set(appointmentid, txs):
 def get_carriers():
     return db.select('carrier', order='name ASC')
 
+def get_carrier(id):
+    return db.where('carrier', id=id)[0]
+
 def new_carrier(form):
     return db.insert('carrier',
                      name=form.name.get_value(),
@@ -310,4 +340,11 @@ def new_carrier(form):
                      eclaim=form.eclaim.get_value())
 
 # carriers
+# =================================================================
+# plans
+
+def get_plan(id):
+    return db.select(['journal', 'plan'], where='plan.journalid=journal.id and journalid=%d' % id)[0]
+
+# plans
 # =================================================================
