@@ -41,7 +41,7 @@ urls = (
     '/today', 'schedule.oneday',
     '/days', 'schedule.days',
     # carriers
-    '/setup/carriers', 'carriers.edit',
+    '/setup/carriers', 'setup.carriers',
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!

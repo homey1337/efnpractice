@@ -3,7 +3,7 @@ import hello
 import model
 
 
-class edit:
+class carriers:
     def GET(self):
         return hello.render.carriers(model.get_carriers(), forms.carrier())
 
