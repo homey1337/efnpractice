@@ -1,3 +1,51 @@
+12 Jan 2013
+
+achievements since last note:
+
+* visual appointment display is done and satisfactory; there is only
+  the reservation that blocks showing when we are open each day need
+  to come from the database instead of being hardcoded in config.py
+  as they are now.
+
+* fixed name handling to have a single name field; this may complicate
+  ADA claim form generation as I notice the fields specify last name
+  first.
+
+* put notes fields in the patient and appointment tables. also claims!
+  all easily edited, and displayed in fairly prominent places.
+
+* topbars on all pages!
+
+* rudimentary insurance processing; this needs a lot of help before it
+  can be called complete. currently treatment can be posted, a claim
+  can be generated, fees can be entered, there is a way for payments
+  to be entered. it's all very yucky. will probably be days yet before
+  it is useful. time for a conference with the payment people though.
+
+* and I put in an index.
+
+it looks like everything from 02 Jan has been taken care of. what
+remains?
+
+* more prettification
+
+* ergonomics; in particular, some care needs to go into the
+  appointment -> post treatment -> create claim -> process eob ->
+  accept payment workflow.
+
+* printing claim forms
+
+* passing claims to a clearinghouse
+
+* streamlining document handling ... it should be possible to have an
+  application that scans the documents directory and uploads scanned
+  documents to patient charts.
+
+* some thought should be given to backups of the database, since value
+  will be high and redundancy will be critical.
+
+* integration with XDR or another imaging program.
+
 02 Jan 2013
 
 have achieved a decent intermediate product
