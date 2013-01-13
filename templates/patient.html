@@ -57,12 +57,12 @@ $if pt:
     <a href="/new/Rx?pt=$pt.id">Rx</a>
     <a href="/new/progress?pt=$pt.id">progress</a>
     <a href="/new/plan?pt=$pt.id">plan</a>
+    <a href="/new/claim?pt=$pt.id">claim</a>
     <a href="/txplan/$pt.id">tx</a>
   </div>
 
   $ future = True
   $ tomorrow = model.store_datetime((datetime.datetime.now(tz=config.tz).replace(hour=0,minute=0,second=0,microsecond=0)+datetime.timedelta(seconds=86400)).astimezone(pytz.utc))
-  $ balance = 0.0
   <div id="journal">
   $for entry in journal:
     $if future and entry.ts < tomorrow:
@@ -74,8 +74,7 @@ $if pt:
       <span>$entry.summary</span>
       $if entry.money:
         <span class="money">$('$ %.2f' % entry.money)</span>
-        $ balance += entry.money
-        <span class="money">$('$ %.2f' % balance)</span>
+        <span class="money">$('$ %.2f' % entry.balance)</span>
       $else:
         <span> </span>
         <span> </span>

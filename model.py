@@ -228,7 +228,8 @@ def get_journal(patientid, **kw):
     if len(kw):
         raise ValueError('cannot handle keyword arguments other than limit and offset')
 
-    return db.where('journal', order='ts DESC', patientid=patientid, **d).list()
+    # this query just smells expensive
+    return db.query('select *, (select sum(money) from journal where patientid=jj.patientid and ts <= jj.ts) as balance from journal as jj where patientid=%d order by ts desc' % patientid).list()
 
 def get_journal_entry(journalid):
     return db.where('journal', id=journalid)[0]
