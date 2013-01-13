@@ -19,6 +19,11 @@ input[type=text] {
     width: 15em;
 }
 
+input.money[type=text] {
+    width: 5em;
+    text-align: right;
+}
+
 textarea {
     position: relative;
     font-family: sans-serif;

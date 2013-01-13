@@ -42,6 +42,8 @@ urls = (
     '/days', 'schedule.days',
     # carriers
     '/setup/carriers', 'setup.carriers',
+    # claims
+    '/update_claim/(.*)', 'claim.update_claim',
 )
 app = web.application(urls, globals())
 render = web.template.render('templates/', globals=globals()) #lazy!
@@ -198,6 +200,17 @@ class view_handlers (web.storage):
         else:
             primary = None
         return render.plan(journal, plan, pt, carrier, insured, primary)
+
+    @staticmethod
+    def claim(journal):
+        pt = model.get_pt(journal.patientid)
+        claim = model.get_claim(journal.id)
+        form = forms.claim()
+        form.summary.set_value(journal.summary)
+        form.notes.set_value(claim.notes)
+        plan = model.get_plan(claim.planid)
+        txs = model.get_tx_for_claim(claim.journalid)
+        return render.claim(pt, claim, form, plan, txs)
 
     @staticmethod
     def Rx(journal):

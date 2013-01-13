@@ -99,3 +99,75 @@ TREATING DENTIST
 
 Whew!
 """
+
+
+import forms
+import hello
+import model
+
+import web
+
+
+class update_claim:
+    def POST(self, claimid):
+        claimid = int(claimid)
+        journal = model.get_journal_entry(claimid)
+        claim = model.get_claim(claimid)
+        txs = model.get_tx_for_claim(claimid)
+        pt = model.get_pt(journal.patientid)
+
+        # validate form input
+        inp = web.input()
+        form = forms.claim()
+        if not form.validates(inp):
+            plan = model.get_plan(claim.planid)
+            return hello.render.claim(pt, claim, form, plan, txs)
+
+        # update the claim
+        model.db.update('claim', where='journalid=%d' % journal.id,
+                        notes=form.notes.get_value())
+
+        # update the journal
+        model.db.update('journal', where='id=%d' % journal.id,
+                        summary=form.summary.get_value())
+
+        # now go through and update the treatment
+        deltains = 0.0
+        deltapt = 0.0
+        for tx in txs:
+            fee = inp['fee%d' % tx.id]
+            if fee:
+                fee = float(fee)
+            else:
+                fee = 0.0
+            allowed = inp['allowed%d' % tx.id]
+            if allowed:
+                allowed = float(allowed)
+            else:
+                allowed = None
+            inspaid = inp['inspaid%d' % tx.id]
+            if inspaid:
+                inspaid = float(inspaid)
+            else:
+                inspaid = None
+            ptpaid = inp['ptpaid%d' % tx.id]
+            if ptpaid:
+                ptpaid = float(ptpaid)
+            else:
+                ptpaid = None
+
+            deltains += (inspaid or 0.0) - float(tx.inspaid or 0.0)
+            deltapt += (ptpaid or 0.0) - float(tx.ptpaid or 0.0)
+
+            model.db.update('tx', where='id=%d' % tx.id,
+                            fee=fee,
+                            allowed=allowed,
+                            inspaid=inspaid,
+                            ptpaid=ptpaid)
+
+        if deltains >= 0.01:
+            model.new_payment_for_pt(pt, 'insurance payment', -deltains)
+        if deltapt >= 0.01:
+            model.new_payment_for_pt(pt, 'patient payment', -deltapt)
+
+        raise web.seeother('/journal/%d' % journal.id)

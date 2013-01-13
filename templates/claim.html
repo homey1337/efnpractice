@@ -1,0 +1,104 @@
+$def with (pt, claim, form, plan, txs)
+
+<html>
+<head>
+<title>Claim for $pt.name - dp</title>
+<link rel="stylesheet" href="/static/dp.css"/>
+</head>
+<body>
+
+<div id="topbar">
+  <a href="/patient/$pt.id">$pt.name</a>
+  <form method="POST" action="/searchpt">
+    <input type="text" name="query"/>
+    <button type="submit" name="submit">search</button>
+  </form>
+</div>
+
+<form method="POST" action="/update_claim/$claim.journalid">
+  <div id="claim">
+    <div>
+      <span>summary</span>
+      <span>$:form.summary.render()</span>
+      <span>$form.summary.note</span>
+    </div>
+    <div>
+      <span>filed</span>
+      $if claim.filed:
+        <span>$model.display_datetime(model.load_datetime(claim.filed))</span>
+      $else:
+	<span></span>
+    </div>
+    <div>
+      <span>closed</span>
+      $if claim.closed:
+        <span>$model.display_datetime(model.load_datetime(claim.closed))</span>
+      $else:
+	<span></span>
+    </div>
+    <div>
+      <span>notes</span>
+      <span>$:form.notes.render()</span>
+      <span>$form.notes.note</span>
+    </div>
+    <div>
+      <span>plan</span>
+      <span><a href="/journal/$plan.journalid">$plan.summary</a></span>
+    </div>
+    <div>
+      <span>treatments</span>
+      <span>
+	<div id="treatments">
+	  <div class="headers">
+	    <span>summary</span>
+	    <span>code</span>
+	    <span>tooth</span>
+	    <span>surface</span>
+	    <span>fee</span>
+	    <span>allowed</span>
+	    <span>ins paid</span>
+	    <span>pt paid</span>
+	  </div>
+        $for tx in txs:
+          <div class="tx">
+	    <span>$tx.summary</span>
+	    <span>$tx.code</span>
+	    <span>$tx.tooth</span>
+	    <span>$tx.surf</span>
+	    <span>
+	    $if tx.fee:
+	      <input class="money" type="text" name="fee$tx.id" value="$('%.2f' % tx.fee)"/>
+	    $else:
+	      <input class="money" type="text" name="fee$tx.id"/>
+	    </span>
+	    <span>
+	    $if tx.allowed:
+	      <input class="money" type="text" name="allowed$tx.id" value="$('%.2f' % tx.allowed)"/>
+	    $else:
+	      <input class="money" type="text" name="allowed$tx.id"/>
+	    </span>
+	    <span>
+	    $if tx.inspaid:
+	      <input class="money" type="text" name="inspaid$tx.id" value="$('%.2f' % tx.inspaid)"/>
+	    $else:
+	      <input class="money" type="text" name="inspaid$tx.id"/>
+	    </span>
+	    <span>
+	    $if tx.ptpaid:
+	      <input class="money" type="text" name="ptpaid$tx.id" value="$('%.2f' % tx.ptpaid)"/>
+	    $else:
+	      <input class="money" type="text" name="ptpaid$tx.id"/>
+	    </span>
+	  </div>
+	</div>
+      </span>
+    </div>
+    <div>
+      <span></span>
+      <span><button>update</button></span>
+    </div>
+  </div>
+</form>
+
+</body>
+</html>

@@ -34,6 +34,7 @@ looks_like_number = regexp(r'[0-9]+',"doesn't look like a number")
 looks_like_phone = regexp(r'[0-9]{3}-[0-9]{3}-[0-9]{4}', "doesn't look like a phone number")
 valid_relationship = regexp(r'self|spouse|child|other', "not a recognized relationship (self, spouse, child, other)")
 valid_student_status = regexp(r'full-time|part-time|$', "not a recognized status (full-time, part-time, or leave it blank)")
+looks_like_gender = regexp(r'm|f|male|female', "not a recognized gender")
 
 def _rp_is_unique_pt(i):
     if i:
@@ -49,6 +50,7 @@ patient = Form(
     Textbox('name', not_empty, description='patient'),
     Textbox('birthday', looks_like_date, description='birthdate'),
     Textbox('resparty_text', names_unique_pt, description='responsible party'),
+    Textbox('gender', looks_like_gender, description='gender'),
     Textarea('notes', description='notes'),
     Button('submit', type='submit', html='save'),
 )
@@ -95,6 +97,7 @@ journal = dict(
         Hidden('patientid'),
         Hidden('secondaryto'),
         Textbox('summary', not_empty, description='summary'),
+        # TODO in production this should be called when the form is requested
         Dropdown('carrier', construct_carrier_dropdown(), not_zero,
                  description='carrier'),
         Textbox('insured', names_unique_pt, description='insured'),
@@ -110,6 +113,13 @@ journal = dict(
         Textbox('major', looks_like_number, description='major %'),
         Textarea('notes', description='notes'),
         Button('submit', type='submit', html='new'),
+        ),
+    claim = Form(
+        Hidden('patientid'),
+        Hidden('planid'),
+        Textbox('summary', not_empty, description='summary'),
+        Textarea('notes', description='notes'),
+        Button('submit', html='new'),
         ),
     # nice to have some templates to select from
     # should allow free entry too
@@ -153,4 +163,9 @@ carrier = Form(
     Textbox('web', description='web address'),
     Textbox('eclaim', description='electronic payer id'),
     Button('submit', type='submit', html='new'),
+)
+
+claim = Form(
+    Textbox('summary', not_empty, description='summary'),
+    Textarea('notes', description='notes'),
 )

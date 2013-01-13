@@ -57,6 +57,7 @@ $def with (journal, pt, txs, appointments, claims)
 	    <span>$tx.code</span>
 	    <span>$tx.tooth</span>
 	    <span>$tx.surf</span>
+	    <span>
 	    $if tx.fee:
   	      <span class="money">$('$ %.2f' % tx.fee)</span>
 	    $else:
@@ -74,7 +75,7 @@ $def with (journal, pt, txs, appointments, claims)
 	    $else:
 	      <span></span>
 	    $if tx.claimid:
-	      <span><a href="/claim/$tx.claimid">claim</a></span>
+	      <span><a href="/journal/$tx.claimid">claim</a></span>
 	    $else:
 	      <span></span>
 	    $if tx.appointmentid:

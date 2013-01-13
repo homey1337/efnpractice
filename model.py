@@ -85,7 +85,8 @@ def update_pt(f, resparty):
               for k in 'name','birthday','notes'])
     d['id'] = f.id.get_value() or None
     d['resparty'] = resparty
-    db.query('insert or replace into patient (id, name, resparty, birthday, notes) values ($id, $name, $resparty, $birthday, $notes)', d)
+    d['gender'] = dict(f='female', m='male')[f.gender.get_value()[0]]
+    db.query('insert or replace into patient (id, name, resparty, birthday, gender, notes) values ($id, $name, $resparty, $birthday, $gender, $notes)', d)
     row = db.query('select last_insert_rowid() as id')[0]
     if d['id'] is None and d['resparty'] is None:
         db.update('patient', where='id=%d' % row.id, resparty=row.id)
@@ -160,6 +161,23 @@ class new_handlers (web.storage):
                   basic=int(form.basic.get_value()),
                   major=int(form.major.get_value()),
                   notes=form.notes.get_value())
+
+    @staticmethod
+    def claim(journalid, form):
+        if form.planid.get_value():
+            planid = form.planid.get_value()
+        else:
+            planid = get_primary_plan_for_pt(int(form.patientid.get_value())).journalid
+        claimid = db.insert('claim',
+                            journalid=journalid,
+                            preauth=False,
+                            planid=planid,
+                            filed=store_datetime(current_time()),
+                            closed=None,
+                            notes=form.notes.get_value())
+        db.update('tx',
+                  where='journalid is not null and claimid is null',
+                  claimid=claimid)
 
     @staticmethod
     def Rx(journalid, form):
@@ -321,9 +339,11 @@ def appt_tx_set(appointmentid, txs):
               where='id in %s' % str(tuple(txs)),
               appointmentid=appointmentid)
 
+
 # appointment
 # =================================================================
 # carriers
+
 
 def get_carriers():
     return db.select('carrier', order='name ASC')
@@ -339,12 +359,42 @@ def new_carrier(form):
                      web=form.web.get_value(),
                      eclaim=form.eclaim.get_value())
 
+
 # carriers
 # =================================================================
 # plans
 
+
 def get_plan(id):
     return db.select(['journal', 'plan'], where='plan.journalid=journal.id and journalid=%d' % id)[0]
 
+def get_primary_plan_for_pt(patientid):
+    plan = db.select(['journal','plan'],
+                     where='plan.journalid=journal.id and plan.secondaryto is null',
+                     order='ts DESC', limit=1)[0]
+    return plan
+
+
 # plans
+# =================================================================
+# claims
+
+
+def get_claim(claimid):
+    return db.where('claim', journalid=claimid)[0]
+
+def get_tx_for_claim(claimid):
+    return db.where('tx', claimid=claimid).list()
+
+def new_payment_for_pt(pt, summary, amount):
+    journalid = db.insert('journal',
+                          patientid=pt.id,
+                          ts=store_datetime(current_time()),
+                          kind='payment',
+                          summary=summary,
+                          money=amount)
+    return journalid
+
+
+# claims
 # =================================================================
