@@ -25,3 +25,10 @@ class provider:
     specialty = '1223G0001X'
     phone = '405-703-5344'
     additional_id = ''
+
+
+class hours:
+    start = 8
+    lunch = 12
+    resume = 13
+    end = 17

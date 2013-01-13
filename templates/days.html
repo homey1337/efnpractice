@@ -64,10 +64,10 @@ $for d in range(len(days)):
       $:today.strftime('%A<br/>%B %d')
     </div>
 
-    $# TODO this should come from database, obey holidays, etc
-    <div class="appt avail" style="top: $(hourtop(8)); height: $(hourheight(4*60));">
+    $# todo this should allow variation based on day of week etc
+    <div class="appt avail" style="top: $(hourtop(config.hours.start)); height: $(hourheight((config.hours.lunch-config.hours.start)*60));">
     </div>
-    <div class="appt avail" style="top: $(hourtop(13)); height: $(hourheight(4*60));">
+    <div class="appt avail" style="top: $(hourtop(config.hours.resume)); height: $(hourheight((config.hours.end-config.hours.resume)*60));">
     </div>
 
     $for i in range(len(appts)):

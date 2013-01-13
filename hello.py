@@ -229,7 +229,6 @@ class view_handlers (web.storage):
             if tx.appointmentid and tx.appointmentid not in appointments:
                 appointments[tx.appointmentid] = model.get_appointment(tx.appointmentid)
             if tx.claimid and tx.claimid not in claims:
-                # TODO this won't work because claims aren't in model yet
                 claims[tx.claimid] = model.get_claim(tx.claimid)
         return render.tx(journal, pt, txs, appointments, claims)
 
