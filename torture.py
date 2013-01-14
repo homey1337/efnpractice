@@ -35,9 +35,9 @@ def make_person(name, age, resparty):
     month = random.randrange(1, 13)
     day = random.randrange(1, 29)
     year = 2013 - age
-    birthday = '%d-%d-%d' % (2013-age,
-                             random.randrange(1, 13),
-                             random.randrange(1, 29))
+    birthday = '%04d-%02d-%02d' % (2013-age,
+                                   random.randrange(1, 13),
+                                   random.randrange(1, 29))
     return db.insert('patient',
                      name = name,
                      resparty = resparty,

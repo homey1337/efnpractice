@@ -1,3 +1,24 @@
+14 Jan 2013
+
+more to go!
+
+* better appointment scheduling: it should be possible to click on the
+  graphical calendar view instead of only inserting the date/time by
+  hand.
+
+* the ability to locate appointments by selecting criteria and then
+  scheduling an appointment from the resultant list.
+
+birthday month query
+
+	 select * from patient
+	 	where birthday like '%-$month-%'
+		order by substr(birthday, 6);
+
+$month has to be formatted '%02d' (or the strftime formatter %m); for
+the order by clause to work the $day should be formatted with %d as
+well ('%02d') because I'm relying on textual ordering.
+
 12 Jan 2013
 
 achievements since last note:
