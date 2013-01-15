@@ -80,10 +80,11 @@ def get_family(resparty):
 
 def update_pt(f, resparty):
     d = dict([(k, f[k].get_value())
-              for k in 'name','birthday','notes'])
+              for k in 'name','notes'])
     d['id'] = f.id.get_value() or None
     d['resparty'] = resparty
     d['gender'] = dict(f='female', m='male')[f.gender.get_value()[0]]
+    d['birthday'] = model.display_date(model.input_date(f.birthday.get_value()))
     db.query('insert or replace into patient (id, name, resparty, birthday, gender, notes) values ($id, $name, $resparty, $birthday, $gender, $notes)', d)
     row = db.query('select last_insert_rowid() as id')[0]
     if d['id'] is None and d['resparty'] is None:
