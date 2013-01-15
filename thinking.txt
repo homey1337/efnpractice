@@ -1,3 +1,10 @@
+15 Jan 2013
+
+and one more important feature
+
+* online patient registration with health histories and demographic
+  information filled out once.
+
 14 Jan 2013
 
 more to go!
